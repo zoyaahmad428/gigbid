@@ -4,8 +4,8 @@ version = "0.1.0"
 description = "Student scaffold for the AI-4016 GigBid assignment"
 requires-python = ">=3.11"
 dependencies = [
-  "fastapi",
-  "uvicorn[standard]",
+  "fastapi==0.162.7",
+  "uvicorn[standard]==0.54.0",
   "pydantic",
   "pyyaml",
   "langgraph",
@@ -17,7 +17,7 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-dev = ["pytest", "pytest-asyncio", "ruff", "mypy"]
+dev = ["pytest==9.2.0", "pytest-asyncio", "ruff", "mypy", "httpx==0.28.1"]
 # data/pipeline: builds the GigSim dataset from Kaggle sources (make data)
 data = [
   "kaggle==2.2.5",
