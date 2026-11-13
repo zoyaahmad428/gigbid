@@ -1,0 +1,75 @@
+[
+  {
+    "name": "upwork_jobs_2024_50k",
+    "slug": "asaniczka/upwork-job-postings-dataset-2024-50k-records",
+    "url": "https://www.kaggle.com/datasets/asaniczka/upwork-job-postings-dataset-2024-50k-records",
+    "licence": "ODC Attribution License (ODC-By)",
+    "files": [
+      "upwork-jobs.csv"
+    ],
+    "bytes": 72174181,
+    "downloaded_at": "2026-11-13T20:16:18.850383+00:00"
+  },
+  {
+    "name": "upwork_all_jobs_200k",
+    "slug": "asaniczka/all-jobs-on-upwork-200k-plus",
+    "url": "https://www.kaggle.com/datasets/asaniczka/all-jobs-on-upwork-200k-plus",
+    "licence": "ODC Attribution License (ODC-By)",
+    "files": [
+      "all_upwork_jobs_2024-02-07-2024-03-24.csv",
+      "all_upwork_jobs_2024-03-24-2024-05-21.csv",
+      "all_upwork_jobs_2024-05-21-2024-07-25.csv"
+    ],
+    "bytes": 161229440,
+    "downloaded_at": "2026-11-13T20:16:29.671700+00:00"
+  },
+  {
+    "name": "upwork_freelance_jobs_60k",
+    "slug": "ahmedmyalo/upwork-freelance-jobs-60k",
+    "url": "https://www.kaggle.com/datasets/ahmedmyalo/upwork-freelance-jobs-60k",
+    "licence": "apache-2.0",
+    "files": [
+      "Contact.rtf",
+      "Features (columns) description.docx",
+      "Final_Upwork_Dataset.csv",
+      "Final_Upwork_Dataset.xlsx",
+      "Introduction to the Data.docx"
+    ],
+    "bytes": 125347584,
+    "downloaded_at": "2026-11-13T20:16:43.699284+00:00"
+  },
+  {
+    "name": "freelance_contracts_1_3m",
+    "slug": "asaniczka/freelance-contracts-dataset-1-3-million-entries",
+    "url": "https://www.kaggle.com/datasets/asaniczka/freelance-contracts-dataset-1-3-million-entries",
+    "licence": "ODC Attribution License (ODC-By)",
+    "files": [
+      "contracts.csv"
+    ],
+    "bytes": 162774789,
+    "downloaded_at": "2026-11-13T20:16:57.827967+00:00"
+  },
+  {
+    "name": "freelancer_success",
+    "slug": "sarveshchhetri/freelancer-success-earnings-and-churn-prediction",
+    "url": "https://www.kaggle.com/datasets/sarveshchhetri/freelancer-success-earnings-and-churn-prediction",
+    "licence": "apache-2.0",
+    "files": [
+      "freelancer_gig_success_dataset.csv"
+    ],
+    "bytes": 1277200,
+    "downloaded_at": "2026-11-13T20:17:59.636460+00:00"
+  },
+  {
+    "name": "trial_1",
+    "slug": "adityammantri/trial-1",
+    "url": "https://www.kaggle.com/datasets/adityammantri/trial-1",
+    "licence": "unknown",
+    "files": [
+      "preprocessed_unlabelled_data_bert.xlsx",
+      "processed_labeled_dataset_without_encoding.xlsx"
+    ],
+    "bytes": 207058973,
+    "downloaded_at": "2026-11-13T20:17:32.137767+00:00"
+  }
+]

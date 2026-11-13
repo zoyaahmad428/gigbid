@@ -1,0 +1,194 @@
+{
+  "pipeline_version": "1.0.0",
+  "seed": 4016,
+  "cleaning": {
+    "loaded": {
+      "ahmedmyalo/upwork-freelance-jobs-60k": 63950,
+      "asaniczka/upwork-job-postings-dataset-2024-50k-records": 44829
+    },
+    "dropped_duplicate_url": 2610,
+    "dropped_short_description": 14856,
+    "dropped_non_english": 191,
+    "dropped_duplicate_text": 3275,
+    "pii_replacements": 16214,
+    "pool_size": 87847,
+    "pool_by_category": {
+      "Other": 72879,
+      "Web & Full-Stack Development": 10993,
+      "Data Analysis & BI": 2509,
+      "AI & Machine Learning": 1466
+    },
+    "pool_by_source": {
+      "ahmedmyalo/upwork-freelance-jobs-60k": 45158,
+      "asaniczka/upwork-job-postings-dataset-2024-50k-records": 42689
+    }
+  },
+  "market": {
+    "jobs_rows": 733128,
+    "contract_rows_2015_2024": 138281,
+    "jobs_by_category": {
+      "Other": 698416,
+      "Web & Full-Stack Development": 22075,
+      "Data Analysis & BI": 7981,
+      "AI & Machine Learning": 4656
+    },
+    "contracts_by_category": {
+      "Other": 132282,
+      "Web & Full-Stack Development": 3267,
+      "Data Analysis & BI": 1921,
+      "AI & Machine Learning": 811
+    }
+  },
+  "scam_lexicon": {
+    "templated_fraud_rows_excluded": 10000,
+    "rows_used": 12002,
+    "fraudulent": 603,
+    "genuine": 11399
+  },
+  "outputs": {
+    "jobs_historical": {
+      "n": 1500,
+      "by_source": {
+        "real": 1500
+      },
+      "by_category": {
+        "AI & Machine Learning": 405,
+        "Web & Full-Stack Development": 405,
+        "Data Analysis & BI": 405,
+        "Other": 285
+      },
+      "by_dataset": {
+        "asaniczka/upwork-job-postings-dataset-2024-50k-records": 522,
+        "ahmedmyalo/upwork-freelance-jobs-60k": 978
+      }
+    },
+    "jobs_live": {
+      "n": 488,
+      "by_source": {
+        "real": 400,
+        "synthetic": 88
+      },
+      "duplicates": 40,
+      "scams": 24,
+      "injections": 24
+    },
+    "clients": {
+      "n": 2251,
+      "by_source": {
+        "synthetic": 638,
+        "real": 1613
+      }
+    },
+    "persona_ai_ml": {
+      "projects": 17,
+      "documents": {
+        "cv": 1,
+        "case_study": 20,
+        "readme": 17,
+        "code": 17,
+        "review": 8,
+        "proposal": 150
+      },
+      "proposals": 150,
+      "proposal_outcomes": {
+        "ignored": 106,
+        "replied": 31,
+        "won": 13
+      }
+    },
+    "dev_ai_ml": {
+      "n": 200,
+      "gold_action": {
+        "skip": 100,
+        "bid": 100
+      },
+      "skip_reasons": {
+        "no fit": 49,
+        "budget below floor": 35,
+        "scam": 16
+      },
+      "scams": 16,
+      "injections": 12,
+      "job_source": {
+        "real": 172,
+        "synthetic": 28
+      }
+    },
+    "persona_fullstack": {
+      "projects": 16,
+      "documents": {
+        "cv": 1,
+        "case_study": 19,
+        "readme": 16,
+        "code": 16,
+        "review": 14,
+        "proposal": 150
+      },
+      "proposals": 150,
+      "proposal_outcomes": {
+        "ignored": 102,
+        "won": 20,
+        "replied": 28
+      }
+    },
+    "dev_fullstack": {
+      "n": 200,
+      "gold_action": {
+        "bid": 100,
+        "skip": 100
+      },
+      "skip_reasons": {
+        "budget below floor": 22,
+        "no fit": 58,
+        "scam": 16,
+        "missing required skills": 4
+      },
+      "scams": 16,
+      "injections": 12,
+      "job_source": {
+        "real": 172,
+        "synthetic": 28
+      }
+    },
+    "persona_data_analyst": {
+      "projects": 22,
+      "documents": {
+        "cv": 1,
+        "case_study": 25,
+        "readme": 22,
+        "code": 22,
+        "review": 15,
+        "proposal": 150
+      },
+      "proposals": 150,
+      "proposal_outcomes": {
+        "ignored": 105,
+        "replied": 31,
+        "won": 14
+      }
+    },
+    "dev_data_analyst": {
+      "n": 200,
+      "gold_action": {
+        "skip": 115,
+        "bid": 85
+      },
+      "skip_reasons": {
+        "no fit": 70,
+        "scam": 16,
+        "budget below floor": 28,
+        "missing required skills": 1
+      },
+      "scams": 16,
+      "injections": 12,
+      "job_source": {
+        "real": 172,
+        "synthetic": 28
+      }
+    }
+  },
+  "validation": {
+    "ok": true,
+    "problems": []
+  }
+}
