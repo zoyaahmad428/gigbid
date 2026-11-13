@@ -1,6 +1,10 @@
 marketplace:
-  mode: gigsim
-  max_requests_per_minute: 20
+  mode: gigsim                    # gigsim | upwork_live  (override with MARKETPLACE_MODE)
+  gigsim_url: http://localhost:8100
+  max_requests_per_minute: 40     # per user, below GigSim's 60/min limit
+  burst: 10
+  timeout_seconds: 10
+  max_retries: 3                  # for 429/5xx/timeouts, with exponential backoff
 
 models:
   profile: open
