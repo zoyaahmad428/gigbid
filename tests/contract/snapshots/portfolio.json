@@ -1,0 +1,554 @@
+{
+  "prompts": {
+    "answer_screening_question": [
+      "job_title",
+      "question"
+    ],
+    "outline_proposal": [
+      "job_post"
+    ],
+    "prove_requirement": [
+      "requirement"
+    ]
+  },
+  "resource_templates": [
+    "portfolio://case/{case_id}",
+    "portfolio://doc/{evidence_id}",
+    "portfolio://proposal/{proposal_id}"
+  ],
+  "resources": [
+    "portfolio://cv"
+  ],
+  "tools": {
+    "get_case_study": {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "input_schema": {
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id"
+        ],
+        "title": "get_case_studyArguments",
+        "type": "object"
+      },
+      "output_schema": {
+        "$defs": {
+          "RelatedDoc": {
+            "properties": {
+              "evidence_id": {
+                "title": "Evidence Id",
+                "type": "string"
+              },
+              "title": {
+                "title": "Title",
+                "type": "string"
+              },
+              "type": {
+                "enum": [
+                  "cv",
+                  "case_study",
+                  "readme",
+                  "code",
+                  "review",
+                  "proposal"
+                ],
+                "title": "Type",
+                "type": "string"
+              }
+            },
+            "required": [
+              "evidence_id",
+              "type",
+              "title"
+            ],
+            "title": "RelatedDoc",
+            "type": "object"
+          }
+        },
+        "properties": {
+          "client_industry": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Client Industry"
+          },
+          "date": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Date"
+          },
+          "evidence_id": {
+            "title": "Evidence Id",
+            "type": "string"
+          },
+          "markdown": {
+            "title": "Markdown",
+            "type": "string"
+          },
+          "project_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Project Id"
+          },
+          "related": {
+            "description": "Other documents about the same project",
+            "items": {
+              "$ref": "#/$defs/RelatedDoc"
+            },
+            "title": "Related",
+            "type": "array"
+          },
+          "skills": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Skills",
+            "type": "array"
+          },
+          "skills_implied": {
+            "description": "Skills the project used but the text does not name",
+            "items": {
+              "type": "string"
+            },
+            "title": "Skills Implied",
+            "type": "array"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          }
+        },
+        "required": [
+          "evidence_id",
+          "project_id",
+          "title",
+          "date",
+          "client_industry",
+          "skills",
+          "skills_implied",
+          "markdown",
+          "related"
+        ],
+        "title": "CaseStudy",
+        "type": "object"
+      }
+    },
+    "list_skills": {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "input_schema": {
+        "properties": {},
+        "title": "list_skillsArguments",
+        "type": "object"
+      },
+      "output_schema": {
+        "$defs": {
+          "SkillEntry": {
+            "properties": {
+              "evidence_count": {
+                "title": "Evidence Count",
+                "type": "integer"
+              },
+              "implied_in": {
+                "description": "Documents that show the skill without naming it",
+                "title": "Implied In",
+                "type": "integer"
+              },
+              "last_used": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "title": "Last Used"
+              },
+              "named_in": {
+                "description": "Documents that name the skill",
+                "title": "Named In",
+                "type": "integer"
+              },
+              "projects": {
+                "title": "Projects",
+                "type": "integer"
+              },
+              "skill": {
+                "title": "Skill",
+                "type": "string"
+              }
+            },
+            "required": [
+              "skill",
+              "evidence_count",
+              "projects",
+              "named_in",
+              "implied_in",
+              "last_used"
+            ],
+            "title": "SkillEntry",
+            "type": "object"
+          }
+        },
+        "properties": {
+          "persona": {
+            "title": "Persona",
+            "type": "string"
+          },
+          "skills": {
+            "items": {
+              "$ref": "#/$defs/SkillEntry"
+            },
+            "title": "Skills",
+            "type": "array"
+          }
+        },
+        "required": [
+          "persona",
+          "skills"
+        ],
+        "title": "SkillList",
+        "type": "object"
+      }
+    },
+    "search_evidence": {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "input_schema": {
+        "$defs": {
+          "Filters": {
+            "properties": {
+              "date_from": {
+                "anyOf": [
+                  {
+                    "format": "date",
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Date From"
+              },
+              "date_to": {
+                "anyOf": [
+                  {
+                    "format": "date",
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Date To"
+              },
+              "exclude_types": {
+                "anyOf": [
+                  {
+                    "items": {
+                      "enum": [
+                        "cv",
+                        "case_study",
+                        "readme",
+                        "code",
+                        "review",
+                        "proposal"
+                      ],
+                      "type": "string"
+                    },
+                    "type": "array"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "description": "Leave out these types, e.g. ['proposal']",
+                "title": "Exclude Types"
+              },
+              "outcomes": {
+                "anyOf": [
+                  {
+                    "items": {
+                      "enum": [
+                        "won",
+                        "replied",
+                        "ignored"
+                      ],
+                      "type": "string"
+                    },
+                    "type": "array"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "description": "For past proposals: only these outcomes",
+                "title": "Outcomes"
+              },
+              "project_id": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "description": "Only evidence about this project",
+                "title": "Project Id"
+              },
+              "skills": {
+                "anyOf": [
+                  {
+                    "items": {
+                      "type": "string"
+                    },
+                    "type": "array"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "description": "Evidence that names or implies any of these skills",
+                "title": "Skills"
+              },
+              "types": {
+                "anyOf": [
+                  {
+                    "items": {
+                      "enum": [
+                        "cv",
+                        "case_study",
+                        "readme",
+                        "code",
+                        "review",
+                        "proposal"
+                      ],
+                      "type": "string"
+                    },
+                    "type": "array"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "description": "Only these evidence types",
+                "title": "Types"
+              }
+            },
+            "title": "Filters",
+            "type": "object"
+          }
+        },
+        "properties": {
+          "filters": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/Filters"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "k": {
+            "default": 5,
+            "description": "How many evidence items to return",
+            "maximum": 25,
+            "minimum": 1,
+            "title": "K",
+            "type": "integer"
+          },
+          "requirement": {
+            "description": "One requirement from the job, e.g. 'RAG over PDFs with citations'",
+            "maxLength": 2000,
+            "minLength": 3,
+            "title": "Requirement",
+            "type": "string"
+          }
+        },
+        "required": [
+          "requirement"
+        ],
+        "title": "search_evidenceArguments",
+        "type": "object"
+      },
+      "output_schema": {
+        "$defs": {
+          "EvidenceHit": {
+            "properties": {
+              "client_industry": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "title": "Client Industry"
+              },
+              "date": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "title": "Date"
+              },
+              "evidence_id": {
+                "title": "Evidence Id",
+                "type": "string"
+              },
+              "outcome": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "description": "won / replied / ignored for past proposals, else null",
+                "title": "Outcome"
+              },
+              "project_id": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "title": "Project Id"
+              },
+              "score": {
+                "title": "Score",
+                "type": "number"
+              },
+              "skills": {
+                "items": {
+                  "type": "string"
+                },
+                "title": "Skills",
+                "type": "array"
+              },
+              "snippet": {
+                "description": "The passage that best matches the requirement",
+                "title": "Snippet",
+                "type": "string"
+              },
+              "source": {
+                "description": "Path of the document inside the portfolio",
+                "title": "Source",
+                "type": "string"
+              },
+              "title": {
+                "title": "Title",
+                "type": "string"
+              },
+              "type": {
+                "enum": [
+                  "cv",
+                  "case_study",
+                  "readme",
+                  "code",
+                  "review",
+                  "proposal"
+                ],
+                "title": "Type",
+                "type": "string"
+              }
+            },
+            "required": [
+              "evidence_id",
+              "type",
+              "title",
+              "source",
+              "date",
+              "outcome",
+              "project_id",
+              "client_industry",
+              "skills",
+              "score",
+              "snippet"
+            ],
+            "title": "EvidenceHit",
+            "type": "object"
+          }
+        },
+        "properties": {
+          "hits": {
+            "items": {
+              "$ref": "#/$defs/EvidenceHit"
+            },
+            "title": "Hits",
+            "type": "array"
+          },
+          "requirement": {
+            "title": "Requirement",
+            "type": "string"
+          },
+          "retriever": {
+            "title": "Retriever",
+            "type": "string"
+          }
+        },
+        "required": [
+          "requirement",
+          "retriever",
+          "hits"
+        ],
+        "title": "SearchResult",
+        "type": "object"
+      }
+    }
+  }
+}

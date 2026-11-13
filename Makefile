@@ -1,4 +1,4 @@
-.PHONY: install api test lint eval data-download seed data-validate gigsim gigsim-test
+.PHONY: install api test lint eval data-download seed data-validate gigsim gigsim-test mcp-portfolio mcp-marketplace mcp-workspace mcp-test snapshots
 install:
 	python -m pip install -e ".[dev]"
 
@@ -30,3 +30,19 @@ gigsim:
 
 gigsim-test:
 	GIGSIM_CHAOS=0 python -m pytest gigsim/tests -q
+
+# ---- MCP servers (Streamable HTTP with bearer auth; stdio: python -m mcp_servers.<name>.server)
+mcp-portfolio:
+	python -m mcp_servers.portfolio.server --http --port 8201
+
+mcp-marketplace:
+	python -m mcp_servers.marketplace.server --http --port 8202
+
+mcp-workspace:
+	python -m mcp_servers.workspace.server --http --port 8203
+
+mcp-test:
+	GIGSIM_CHAOS=0 python -m pytest mcp_servers tests/contract -q
+
+snapshots:
+	UPDATE_SNAPSHOTS=1 python -m pytest tests/contract -q

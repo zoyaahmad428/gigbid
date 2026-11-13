@@ -1,0 +1,455 @@
+{
+  "prompts": {},
+  "resource_templates": [],
+  "resources": [],
+  "tools": {
+    "cancel_hold": {
+      "annotations": {
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": false
+      },
+      "input_schema": {
+        "properties": {
+          "hold_id": {
+            "title": "Hold Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "hold_id"
+        ],
+        "title": "cancel_holdArguments",
+        "type": "object"
+      },
+      "output_schema": {
+        "properties": {
+          "end": {
+            "title": "End",
+            "type": "string"
+          },
+          "hold_id": {
+            "title": "Hold Id",
+            "type": "string"
+          },
+          "idempotent_replay": {
+            "default": false,
+            "title": "Idempotent Replay",
+            "type": "boolean"
+          },
+          "start": {
+            "title": "Start",
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "tentative",
+              "cancelled"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          }
+        },
+        "required": [
+          "hold_id",
+          "start",
+          "end",
+          "title",
+          "status"
+        ],
+        "title": "Hold",
+        "type": "object"
+      }
+    },
+    "create_email_draft": {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": false
+      },
+      "input_schema": {
+        "properties": {
+          "body": {
+            "maxLength": 10000,
+            "minLength": 1,
+            "title": "Body",
+            "type": "string"
+          },
+          "idempotency_key": {
+            "maxLength": 128,
+            "minLength": 8,
+            "pattern": "^[A-Za-z0-9_.:-]+$",
+            "title": "Idempotency Key",
+            "type": "string"
+          },
+          "subject": {
+            "maxLength": 300,
+            "minLength": 1,
+            "title": "Subject",
+            "type": "string"
+          },
+          "to_label": {
+            "description": "Who it is for, e.g. 'Client: Acme' (no address)",
+            "maxLength": 200,
+            "minLength": 1,
+            "title": "To Label",
+            "type": "string"
+          }
+        },
+        "required": [
+          "to_label",
+          "subject",
+          "body",
+          "idempotency_key"
+        ],
+        "title": "create_email_draftArguments",
+        "type": "object"
+      },
+      "output_schema": {
+        "properties": {
+          "body": {
+            "title": "Body",
+            "type": "string"
+          },
+          "draft_id": {
+            "title": "Draft Id",
+            "type": "string"
+          },
+          "idempotent_replay": {
+            "default": false,
+            "title": "Idempotent Replay",
+            "type": "boolean"
+          },
+          "sent": {
+            "default": false,
+            "description": "Always false: this server only creates drafts",
+            "title": "Sent",
+            "type": "boolean"
+          },
+          "subject": {
+            "title": "Subject",
+            "type": "string"
+          },
+          "to_label": {
+            "title": "To Label",
+            "type": "string"
+          }
+        },
+        "required": [
+          "draft_id",
+          "to_label",
+          "subject",
+          "body"
+        ],
+        "title": "Draft",
+        "type": "object"
+      }
+    },
+    "create_tentative_hold": {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": false
+      },
+      "input_schema": {
+        "properties": {
+          "duration_minutes": {
+            "maximum": 120,
+            "minimum": 15,
+            "title": "Duration Minutes",
+            "type": "integer"
+          },
+          "idempotency_key": {
+            "maxLength": 128,
+            "minLength": 8,
+            "pattern": "^[A-Za-z0-9_.:-]+$",
+            "title": "Idempotency Key",
+            "type": "string"
+          },
+          "note": {
+            "default": "",
+            "maxLength": 1000,
+            "title": "Note",
+            "type": "string"
+          },
+          "start": {
+            "description": "ISO 8601 with offset",
+            "title": "Start",
+            "type": "string"
+          },
+          "title": {
+            "maxLength": 200,
+            "minLength": 3,
+            "title": "Title",
+            "type": "string"
+          }
+        },
+        "required": [
+          "start",
+          "duration_minutes",
+          "title",
+          "idempotency_key"
+        ],
+        "title": "create_tentative_holdArguments",
+        "type": "object"
+      },
+      "output_schema": {
+        "properties": {
+          "end": {
+            "title": "End",
+            "type": "string"
+          },
+          "hold_id": {
+            "title": "Hold Id",
+            "type": "string"
+          },
+          "idempotent_replay": {
+            "default": false,
+            "title": "Idempotent Replay",
+            "type": "boolean"
+          },
+          "start": {
+            "title": "Start",
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "tentative",
+              "cancelled"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          }
+        },
+        "required": [
+          "hold_id",
+          "start",
+          "end",
+          "title",
+          "status"
+        ],
+        "title": "Hold",
+        "type": "object"
+      }
+    },
+    "get_free_slots": {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "input_schema": {
+        "properties": {
+          "client_timezone": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Client's IANA time zone, to show both",
+            "title": "Client Timezone"
+          },
+          "days": {
+            "default": 5,
+            "description": "How many days ahead to look, starting tomorrow",
+            "maximum": 14,
+            "minimum": 1,
+            "title": "Days",
+            "type": "integer"
+          },
+          "duration_minutes": {
+            "default": 30,
+            "maximum": 120,
+            "minimum": 15,
+            "title": "Duration Minutes",
+            "type": "integer"
+          },
+          "max_slots": {
+            "default": 6,
+            "maximum": 20,
+            "minimum": 1,
+            "title": "Max Slots",
+            "type": "integer"
+          },
+          "start_date": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "YYYY-MM-DD; default is tomorrow",
+            "title": "Start Date"
+          },
+          "timezone": {
+            "default": "Asia/Karachi",
+            "description": "Freelancer's IANA time zone",
+            "title": "Timezone",
+            "type": "string"
+          }
+        },
+        "title": "get_free_slotsArguments",
+        "type": "object"
+      },
+      "output_schema": {
+        "$defs": {
+          "Slot": {
+            "properties": {
+              "end": {
+                "title": "End",
+                "type": "string"
+              },
+              "start": {
+                "description": "ISO 8601 with offset, in the freelancer's time zone",
+                "title": "Start",
+                "type": "string"
+              },
+              "start_client_tz": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "description": "Same start time in the client's time zone",
+                "title": "Start Client Tz"
+              }
+            },
+            "required": [
+              "start",
+              "end"
+            ],
+            "title": "Slot",
+            "type": "object"
+          }
+        },
+        "properties": {
+          "client_timezone": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Client Timezone"
+          },
+          "slots": {
+            "items": {
+              "$ref": "#/$defs/Slot"
+            },
+            "title": "Slots",
+            "type": "array"
+          },
+          "timezone": {
+            "title": "Timezone",
+            "type": "string"
+          }
+        },
+        "required": [
+          "timezone",
+          "client_timezone",
+          "slots"
+        ],
+        "title": "Slots",
+        "type": "object"
+      }
+    },
+    "list_holds": {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "input_schema": {
+        "properties": {},
+        "title": "list_holdsArguments",
+        "type": "object"
+      },
+      "output_schema": {
+        "$defs": {
+          "Hold": {
+            "properties": {
+              "end": {
+                "title": "End",
+                "type": "string"
+              },
+              "hold_id": {
+                "title": "Hold Id",
+                "type": "string"
+              },
+              "idempotent_replay": {
+                "default": false,
+                "title": "Idempotent Replay",
+                "type": "boolean"
+              },
+              "start": {
+                "title": "Start",
+                "type": "string"
+              },
+              "status": {
+                "enum": [
+                  "tentative",
+                  "cancelled"
+                ],
+                "title": "Status",
+                "type": "string"
+              },
+              "title": {
+                "title": "Title",
+                "type": "string"
+              }
+            },
+            "required": [
+              "hold_id",
+              "start",
+              "end",
+              "title",
+              "status"
+            ],
+            "title": "Hold",
+            "type": "object"
+          }
+        },
+        "properties": {
+          "holds": {
+            "items": {
+              "$ref": "#/$defs/Hold"
+            },
+            "title": "Holds",
+            "type": "array"
+          }
+        },
+        "required": [
+          "holds"
+        ],
+        "title": "Holds",
+        "type": "object"
+      }
+    }
+  }
+}

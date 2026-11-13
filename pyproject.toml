@@ -11,13 +11,13 @@ dependencies = [
   "langgraph",
   "langchain",
   "langchain-mcp-adapters",
-  "mcp",
+  "mcp==2.3.0",
   "httpx",
   "python-dotenv",
 ]
 
 [project.optional-dependencies]
-dev = ["pytest==9.2.0", "pytest-asyncio", "ruff", "mypy", "httpx==0.28.1"]
+dev = ["pytest==9.2.0", "pytest-asyncio==1.5.0", "ruff", "mypy", "httpx==0.28.1"]
 # data/pipeline: builds the GigSim dataset from Kaggle sources (make data)
 data = [
   "kaggle==2.2.5",
@@ -32,3 +32,7 @@ data = [
 
 [tool.ruff]
 line-length = 100
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
