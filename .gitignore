@@ -17,3 +17,6 @@ evals/results/*
 .venv/
 data/raw/
 data/interim/
+
+# GigSim runtime state
+gigsim/state/

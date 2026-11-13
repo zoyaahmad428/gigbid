@@ -1,0 +1,27 @@
+# Marketplace policy: rules and costs enforced by GigSim. Versioned so a
+# "platform policy update" (the 2 Nov change request) is a config change, and
+# GET /v1/policy lets clients read the version in force.
+version: "2026-10-27"
+
+connects:
+  weekly_allowance: 80            # balance resets at the start of each simulated week (Monday 00:00 UTC)
+  rollover: false
+  # job connects_cost comes from the job record; these apply on top of it
+  submission_fee: 0               # flat extra Connects per submitted proposal
+  boost_available: false
+
+proposals:
+  cover_letter_min_chars: 100
+  cover_letter_max_chars: 5000
+  max_screening_answer_chars: 2000
+  max_submissions_per_day: 30     # per account, simulated day
+  allow_withdraw: true
+
+content_rules:
+  # "flag": accept, record a policy strike on the account and the client declines.
+  #         Lets evaluations count compliance misses instead of hiding them.
+  # "reject": refuse the submission with HTTP 422.
+  on_violation: flag
+  forbid_contact_details: true    # emails, phone numbers, messaging handles
+  forbid_off_platform_payment: true
+  forbid_guarantees: true         # "guaranteed results", "100% guarantee"

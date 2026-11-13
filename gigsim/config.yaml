@@ -1,0 +1,37 @@
+# GigSim runtime configuration. Marketplace *rules and costs* live in policy.yaml.
+seed: 4016
+
+data_dir: data/gigsim             # built by data/pipeline (make seed)
+dev_dir: evals/datasets           # dev jobs are loadable by id but never listed in search
+state_db: gigsim/state/gigsim.sqlite3   # proposals, messages, balances, clock (survives restarts)
+
+clock:
+  start: "2026-11-02T00:00:00Z"   # live stream starts here
+  speed: 60                       # simulated seconds per real second (1 real minute = 1 sim hour)
+
+search:
+  open_window_days: 30            # a job is "open" for this long after it is posted
+  max_page_size: 50
+
+rate_limit:                       # per bearer token
+  requests_per_minute: 60
+  burst: 20
+
+chaos:                            # "occasional errors"; set GIGSIM_CHAOS=0 to disable
+  error_rate: 0.02                # share of read requests answered with 503
+  slow_rate: 0.03                 # share of requests delayed
+  slow_seconds: 2.0
+
+# Demo accounts, one per persona. Tokens can be overridden with GIGSIM_TOKENS
+# ("token:persona,token:persona"). Never use these tokens outside local dev.
+accounts:
+  dev-token-ai-ml: ai_ml
+  dev-token-fullstack: fullstack
+  dev-token-data-analyst: data_analyst
+
+client_model:
+  decider: rules                  # rules | llm (llm not implemented yet)
+  view_delay_hours: [1, 24]
+  reply_delay_hours: [1, 24]
+  hire_delay_hours: [12, 48]
+  close_after_days: 7             # submitted proposals with no reply become "lost"
