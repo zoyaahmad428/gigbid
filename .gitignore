@@ -20,3 +20,7 @@ data/interim/
 
 # GigSim runtime state
 gigsim/state/
+
+# MCP server runtime state
+mcp_servers/marketplace/audit/
+mcp_servers/workspace/state/
