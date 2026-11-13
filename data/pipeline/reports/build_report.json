@@ -10,7 +10,7 @@
     "dropped_short_description": 14856,
     "dropped_non_english": 191,
     "dropped_duplicate_text": 3275,
-    "pii_replacements": 16214,
+    "pii_replacements": 15666,
     "pool_size": 87847,
     "pool_by_category": {
       "Other": 72879,

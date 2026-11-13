@@ -71,7 +71,7 @@ Code: `data/pipeline/clean/`. The counts below come from the build report.
 3. Drop 14,856 posts whose description is under 200 characters.
 4. Drop 191 posts that aren't English (fewer than 95% ASCII letters).
 5. Remove 3,275 re-posts of the same job (normalised title plus the first 300 characters of the description).
-6. **Mask PII** (16,214 replacements): emails, URLs, phone numbers, card and IBAN numbers and @handles become `[EMAIL]`, `[URL]` and so on.
+6. **Mask PII** (15,666 replacements): emails, URLs, phone numbers, card and IBAN numbers and @handles become `[EMAIL]`, `[URL]` and so on. A match counts as a phone number only if it has 10–15 digits (or starts with `+`) and is not a date or a numeric range. An earlier version masked 548 dates and ranges such as "1000-2000 words" as phones.
 7. **Extract skills.** Explicit tags (60k only) and skills mentioned in free text are mapped to 57 standard skills (`taxonomy.py`). Ambiguous aliases ("R", "ML", "LoRa", "rest") are accepted only from tags, never from free text.
 8. **Assign category and persona fit.** A job fits a persona if it names at least two of that persona's skills, or one in its title.
 9. **Normalise budgets** to USD fixed or hourly. Impossible values become unknown (hourly below $3 or above $500, fixed below $5 or above $250k), and reversed ranges are swapped.

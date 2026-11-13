@@ -58,7 +58,8 @@ _PHONE = re.compile(r"\+?\d[\d\s().-]{8,}\d")
 
 
 def mask(s: str) -> str:
-    return _PHONE.sub("[PHONE]", _EMAIL.sub("[EMAIL]", s))
+    return _PHONE.sub(lambda m: "[PHONE]" if sum(c.isdigit() for c in m.group(0)) >= 10 else m.group(0),
+                      _EMAIL.sub("[EMAIL]", s))
 
 
 app = FastAPI(title="GigSim", version="1.0.0",

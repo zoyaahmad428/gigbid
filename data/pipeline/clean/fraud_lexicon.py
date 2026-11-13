@@ -58,7 +58,7 @@ def fraud_lexicon(raw: Path, top: int = 60, min_count: int = 40) -> tuple[list[d
         cr = real.get(g, 0)
         lo = math.log((cf + 1) / (nf - cf + 1)) - math.log((cr + 1) / (nr - cr + 1))
         rows.append({"phrase": g, "log_odds": round(lo, 3), "fraud_docs": cf, "genuine_docs": cr})
-    rows.sort(key=lambda r: r["log_odds"], reverse=True)
+    rows.sort(key=lambda r: (-r["log_odds"], r["phrase"]))   # phrase breaks ties: set order varies per process
     stats = {"templated_fraud_rows_excluded": n_template, "rows_used": int(len(df)),
              "fraudulent": nf, "genuine": nr}
     return rows[:top], stats

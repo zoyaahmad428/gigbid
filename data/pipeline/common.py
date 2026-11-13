@@ -60,6 +60,21 @@ _EMAIL_RE = re.compile(r"[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}")
 _URL_RE = re.compile(r"\b(?:https?://|www\.)\S+", re.I)
 _PHONE_RE = re.compile(r"(?<!\w)(?:\+?\d[\d\s().-]{7,}\d)(?!\w)")
 _HANDLE_RE = re.compile(r"(?<![\w@])@[A-Za-z0-9_]{3,}")
+
+_RANGE_RE = re.compile(r"\d{1,7}(?:,\d{3})*(?:\.\d+)?\s?[-–]\s?\d{1,7}(?:,\d{3})*(?:\.\d+)?")
+_DATE_RE = re.compile(r"\d{4}[-/.]\d{1,2}[-/.]\d{1,2}|\d{1,2}[-/.]\d{1,2}[-/.]\d{2,4}")
+
+
+def looks_like_phone(s: str) -> bool:
+    """A phone-shaped match counts as a phone number only if it has 10-15 digits
+    (or starts with '+' and has 8+), and is not a date or a numeric range such as
+    "1000-2000" (an earlier version masked those as [PHONE])."""
+    s = s.strip()
+    digits = sum(c.isdigit() for c in s)
+    if digits > 15 or (digits < 10 and not (s.startswith("+") and digits >= 8)):
+        return False
+    return not (_RANGE_RE.fullmatch(s) or _DATE_RE.fullmatch(s))
+
 _CARD_RE = re.compile(r"\b(?:\d[ -]?){13,19}\b")
 _IBAN_RE = re.compile(r"\b[A-Z]{2}\d{2}[A-Z0-9]{11,30}\b")
 
@@ -79,7 +94,9 @@ def mask_pii(text: str) -> tuple[str, int]:
     t = sub(_URL_RE, "[URL]", t)
     t = sub(_IBAN_RE, "[IBAN]", t)
     t = sub(_CARD_RE, "[CARD]", t)
-    t = sub(_PHONE_RE, "[PHONE]", t)
+    t2 = _PHONE_RE.sub(lambda m: "[PHONE]" if looks_like_phone(m.group(0)) else m.group(0), t)
+    n += t2.count("[PHONE]") - t.count("[PHONE]")
+    t = t2
     t = sub(_HANDLE_RE, "[HANDLE]", t)
     return t, n
 
