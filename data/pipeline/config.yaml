@@ -1,0 +1,61 @@
+# GigSim data pipeline configuration.
+# Every size, rate and seed used to build the dataset lives here, so a rebuild is
+# reproducible and the numbers in docs/DATA_CARD.md trace back to this file.
+
+seed: 4016
+pipeline_version: "1.0.0"
+
+paths:
+  raw: data/raw
+  interim: data/interim          # gitignored cache of cleaned real records
+  gigsim: data/gigsim            # job stream, clients, market stats
+  personas: data/personas        # three persona corpora
+  dev_set: evals/datasets        # gold-labelled dev jobs
+  reports: data/pipeline/reports # validation + build reports (committed)
+
+# Kaggle sources. `licence` is filled by fetch_licences.py (needs a Kaggle token);
+# until then it stays "unverified" and the data card says so.
+sources:
+  upwork_jobs_2024_50k:
+    slug: asaniczka/upwork-job-postings-dataset-2024-50k-records
+    role: job postings with title, description, budget/hourly range, country
+  upwork_all_jobs_200k:
+    slug: asaniczka/all-jobs-on-upwork-200k-plus
+    role: job postings Feb-Jul 2024, used for market price statistics
+  upwork_freelance_jobs_60k:
+    slug: ahmedmyalo/upwork-freelance-jobs-60k
+    role: job postings with client-side fields (spend, hires, rating, verification)
+  freelance_contracts_1_3m:
+    slug: asaniczka/freelance-contracts-dataset-1-3-million-entries
+    role: completed contracts, used for client histories and price priors
+  freelancer_success:
+    slug: sarveshchhetri/freelancer-success-earnings-and-churn-prediction
+    role: freelancer profile statistics, used as priors for persona profiles
+  trial_1:
+    slug: adityammantri/trial-1
+    role: labelled job text (inspected; see data card for how it is used)
+
+sizes:
+  historical_jobs: 1500
+  live_jobs: 400                 # before duplicates are added
+  dev_jobs_per_persona: 200
+  clients: 600
+  proposals_per_persona: 150
+  case_studies_per_persona: [15, 25]
+  reviews_per_persona: [12, 20]
+
+live_stream:
+  duplicate_rate: 0.10           # of live jobs; exact + paraphrased copies
+  scam_rate: 0.06
+  injection_rate: 0.06
+  start: "2026-11-02T00:00:00Z"  # stream replays from the change-request date
+  days: 14
+
+dev_set:
+  scam_rate: 0.08
+  injection_rate: 0.06
+  offtopic_rate: 0.25            # jobs the persona should skip on fit
+
+proposal_outcomes:               # base rates before fit/specificity adjustments
+  won: 0.08
+  replied: 0.22                  # remainder = ignored
