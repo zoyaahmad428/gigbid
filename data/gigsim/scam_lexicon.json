@@ -1,0 +1,375 @@
+{
+  "phrases": [
+    {
+      "phrase": "using below",
+      "log_odds": 6.639,
+      "fraud_docs": 37,
+      "genuine_docs": 0
+    },
+    {
+      "phrase": "apply using below",
+      "log_odds": 6.52,
+      "fraud_docs": 33,
+      "genuine_docs": 0
+    },
+    {
+      "phrase": "using below linkurl",
+      "log_odds": 6.52,
+      "fraud_docs": 33,
+      "genuine_docs": 0
+    },
+    {
+      "phrase": "amp get",
+      "log_odds": 6.388,
+      "fraud_docs": 29,
+      "genuine_docs": 0
+    },
+    {
+      "phrase": "extra per",
+      "log_odds": 6.388,
+      "fraud_docs": 29,
+      "genuine_docs": 0
+    },
+    {
+      "phrase": "visit hereurl",
+      "log_odds": 6.064,
+      "fraud_docs": 21,
+      "genuine_docs": 0
+    },
+    {
+      "phrase": "startup fee",
+      "log_odds": 5.912,
+      "fraud_docs": 18,
+      "genuine_docs": 0
+    },
+    {
+      "phrase": "day amp",
+      "log_odds": 5.912,
+      "fraud_docs": 18,
+      "genuine_docs": 0
+    },
+    {
+      "phrase": "amp get biggest",
+      "log_odds": 5.912,
+      "fraud_docs": 18,
+      "genuine_docs": 0
+    },
+    {
+      "phrase": "startup fee visit",
+      "log_odds": 5.912,
+      "fraud_docs": 18,
+      "genuine_docs": 0
+    },
+    {
+      "phrase": "everyone then",
+      "log_odds": 5.912,
+      "fraud_docs": 18,
+      "genuine_docs": 0
+    },
+    {
+      "phrase": "day amp get",
+      "log_odds": 5.912,
+      "fraud_docs": 18,
+      "genuine_docs": 0
+    },
+    {
+      "phrase": "get biggest",
+      "log_odds": 5.912,
+      "fraud_docs": 18,
+      "genuine_docs": 0
+    },
+    {
+      "phrase": "fee visit",
+      "log_odds": 5.912,
+      "fraud_docs": 18,
+      "genuine_docs": 0
+    },
+    {
+      "phrase": "everyone then start",
+      "log_odds": 5.912,
+      "fraud_docs": 18,
+      "genuine_docs": 0
+    },
+    {
+      "phrase": "below linkurl",
+      "log_odds": 5.858,
+      "fraud_docs": 34,
+      "genuine_docs": 1
+    },
+    {
+      "phrase": "biggest cashyou",
+      "log_odds": 5.857,
+      "fraud_docs": 17,
+      "genuine_docs": 0
+    },
+    {
+      "phrase": "then start immediatelycan",
+      "log_odds": 5.857,
+      "fraud_docs": 17,
+      "genuine_docs": 0
+    },
+    {
+      "phrase": "experience requiredzero",
+      "log_odds": 5.857,
+      "fraud_docs": 17,
+      "genuine_docs": 0
+    },
+    {
+      "phrase": "placespend minutes",
+      "log_odds": 5.857,
+      "fraud_docs": 17,
+      "genuine_docs": 0
+    },
+    {
+      "phrase": "experience requiredzero startup",
+      "log_odds": 5.857,
+      "fraud_docs": 17,
+      "genuine_docs": 0
+    },
+    {
+      "phrase": "dayno any experience",
+      "log_odds": 5.857,
+      "fraud_docs": 17,
+      "genuine_docs": 0
+    },
+    {
+      "phrase": "own placespend minutes",
+      "log_odds": 5.857,
+      "fraud_docs": 17,
+      "genuine_docs": 0
+    },
+    {
+      "phrase": "requiredzero startup fee",
+      "log_odds": 5.857,
+      "fraud_docs": 17,
+      "genuine_docs": 0
+    },
+    {
+      "phrase": "extra per dayno",
+      "log_odds": 5.857,
+      "fraud_docs": 17,
+      "genuine_docs": 0
+    },
+    {
+      "phrase": "per dayno",
+      "log_odds": 5.857,
+      "fraud_docs": 17,
+      "genuine_docs": 0
+    },
+    {
+      "phrase": "start immediatelycan earn",
+      "log_odds": 5.857,
+      "fraud_docs": 17,
+      "genuine_docs": 0
+    },
+    {
+      "phrase": "immediatelycan earn",
+      "log_odds": 5.857,
+      "fraud_docs": 17,
+      "genuine_docs": 0
+    },
+    {
+      "phrase": "per dayno any",
+      "log_odds": 5.857,
+      "fraud_docs": 17,
+      "genuine_docs": 0
+    },
+    {
+      "phrase": "fee visit hereurl",
+      "log_odds": 5.857,
+      "fraud_docs": 17,
+      "genuine_docs": 0
+    },
+    {
+      "phrase": "get biggest cashyou",
+      "log_odds": 5.857,
+      "fraud_docs": 17,
+      "genuine_docs": 0
+    },
+    {
+      "phrase": "any experience requiredzero",
+      "log_odds": 5.857,
+      "fraud_docs": 17,
+      "genuine_docs": 0
+    },
+    {
+      "phrase": "requiredzero startup",
+      "log_odds": 5.857,
+      "fraud_docs": 17,
+      "genuine_docs": 0
+    },
+    {
+      "phrase": "nightperfect for everyone",
+      "log_odds": 5.857,
+      "fraud_docs": 17,
+      "genuine_docs": 0
+    },
+    {
+      "phrase": "own placespend",
+      "log_odds": 5.857,
+      "fraud_docs": 17,
+      "genuine_docs": 0
+    },
+    {
+      "phrase": "dayno any",
+      "log_odds": 5.857,
+      "fraud_docs": 17,
+      "genuine_docs": 0
+    },
+    {
+      "phrase": "ced bfa",
+      "log_odds": 5.857,
+      "fraud_docs": 17,
+      "genuine_docs": 0
+    },
+    {
+      "phrase": "start immediatelycan",
+      "log_odds": 5.857,
+      "fraud_docs": 17,
+      "genuine_docs": 0
+    },
+    {
+      "phrase": "type permanent fulltimejob",
+      "log_odds": 5.798,
+      "fraud_docs": 16,
+      "genuine_docs": 0
+    },
+    {
+      "phrase": "permanent fulltimejob",
+      "log_odds": 5.798,
+      "fraud_docs": 16,
+      "genuine_docs": 0
+    },
+    {
+      "phrase": "line requirements",
+      "log_odds": 5.798,
+      "fraud_docs": 16,
+      "genuine_docs": 0
+    },
+    {
+      "phrase": "visit hereurl ebe",
+      "log_odds": 5.798,
+      "fraud_docs": 16,
+      "genuine_docs": 0
+    },
+    {
+      "phrase": "hereurl ebe",
+      "log_odds": 5.798,
+      "fraud_docs": 16,
+      "genuine_docs": 0
+    },
+    {
+      "phrase": "any experience required",
+      "log_odds": 5.736,
+      "fraud_docs": 15,
+      "genuine_docs": 0
+    },
+    {
+      "phrase": "bottom line requirements",
+      "log_odds": 5.599,
+      "fraud_docs": 13,
+      "genuine_docs": 0
+    },
+    {
+      "phrase": "application via",
+      "log_odds": 5.599,
+      "fraud_docs": 13,
+      "genuine_docs": 0
+    },
+    {
+      "phrase": "imtkz and select",
+      "log_odds": 5.599,
+      "fraud_docs": 13,
+      "genuine_docs": 0
+    },
+    {
+      "phrase": "bca imtkz",
+      "log_odds": 5.599,
+      "fraud_docs": 13,
+      "genuine_docs": 0
+    },
+    {
+      "phrase": "opening dropdown",
+      "log_odds": 5.599,
+      "fraud_docs": 13,
+      "genuine_docs": 0
+    },
+    {
+      "phrase": "never any",
+      "log_odds": 5.441,
+      "fraud_docs": 11,
+      "genuine_docs": 0
+    },
+    {
+      "phrase": "amp get started",
+      "log_odds": 5.441,
+      "fraud_docs": 11,
+      "genuine_docs": 0
+    },
+    {
+      "phrase": "action amp",
+      "log_odds": 5.441,
+      "fraud_docs": 11,
+      "genuine_docs": 0
+    },
+    {
+      "phrase": "join amp suitable",
+      "log_odds": 5.441,
+      "fraud_docs": 11,
+      "genuine_docs": 0
+    },
+    {
+      "phrase": "amp suitable",
+      "log_odds": 5.441,
+      "fraud_docs": 11,
+      "genuine_docs": 0
+    },
+    {
+      "phrase": "hrs daily",
+      "log_odds": 5.441,
+      "fraud_docs": 11,
+      "genuine_docs": 0
+    },
+    {
+      "phrase": "join amp",
+      "log_odds": 5.441,
+      "fraud_docs": 11,
+      "genuine_docs": 0
+    },
+    {
+      "phrase": "action amp get",
+      "log_odds": 5.441,
+      "fraud_docs": 11,
+      "genuine_docs": 0
+    },
+    {
+      "phrase": "required and never",
+      "log_odds": 5.441,
+      "fraud_docs": 11,
+      "genuine_docs": 0
+    },
+    {
+      "phrase": "apply using",
+      "log_odds": 5.422,
+      "fraud_docs": 33,
+      "genuine_docs": 2
+    },
+    {
+      "phrase": "opening dropdown menu",
+      "log_odds": 5.352,
+      "fraud_docs": 10,
+      "genuine_docs": 0
+    }
+  ],
+  "meta": {
+    "templated_fraud_rows_excluded": 10000,
+    "rows_used": 12002,
+    "fraudulent": 603,
+    "genuine": 11399
+  },
+  "provenance": {
+    "source": "real",
+    "source_dataset": "adityammantri/trial-1",
+    "note": "aggregate n-gram statistics only; no source text is redistributed"
+  }
+}

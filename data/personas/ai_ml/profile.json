@@ -1,0 +1,47 @@
+{
+  "persona": "ai_ml",
+  "name": "Sana Qureshi",
+  "headline": "Machine Learning Engineer | LLM apps, RAG, NLP and computer vision",
+  "location": "Lahore, Pakistan (remote, overlaps EU/US-East mornings)",
+  "years_experience": 5,
+  "category": "AI & Machine Learning",
+  "core_skills": [
+    "Python",
+    "PyTorch",
+    "scikit-learn",
+    "LLM",
+    "RAG",
+    "LangChain",
+    "NLP",
+    "Computer Vision",
+    "FastAPI",
+    "Docker",
+    "MLOps",
+    "Vector Database"
+  ],
+  "does_not_do": [
+    "Swift",
+    "Unity",
+    "Salesforce",
+    "Solidity"
+  ],
+  "hourly_rate_usd": 55.0,
+  "min_fixed_budget_usd": 100.0,
+  "job_success_score": 93,
+  "jobs_completed": 29,
+  "availability_hours_per_week": 25,
+  "weekly_connects_budget": 100,
+  "priors_from": {
+    "hourly_rate_usd": "p75 contract hourly rate, AI & Machine Learning, freelance_contracts_1_3m",
+    "min_fixed_budget_usd": "p25 posted fixed budget, AI & Machine Learning, upwork_all_jobs_200k",
+    "job_success_score": "p75 job_success_rate, AI & Machine Learning with portfolio, sarveshchhetri/freelancer-success-earnings-and-churn-prediction",
+    "jobs_completed": "median total_jobs_completed, same subset, sarveshchhetri/freelancer-success-earnings-and-churn-prediction"
+  },
+  "provenance": {
+    "source": "synthetic",
+    "source_dataset": "generator",
+    "generator": "synth.personas@1.0.0",
+    "derived_from": null,
+    "synthetic_fields": []
+  }
+}

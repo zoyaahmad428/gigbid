@@ -1,0 +1,47 @@
+{
+  "persona": "fullstack",
+  "name": "Daniyal Mirza",
+  "headline": "Full-Stack Developer | React, Next.js, Node and Django for SaaS products",
+  "location": "Islamabad, Pakistan (remote, flexible hours)",
+  "years_experience": 6,
+  "category": "Web & Full-Stack Development",
+  "core_skills": [
+    "TypeScript",
+    "React",
+    "Next.js",
+    "Node.js",
+    "Django",
+    "PostgreSQL",
+    "REST API",
+    "GraphQL",
+    "Docker",
+    "AWS",
+    "Tailwind CSS",
+    "Stripe"
+  ],
+  "does_not_do": [
+    "Flutter",
+    "Kotlin",
+    "Unreal Engine",
+    "SAP"
+  ],
+  "hourly_rate_usd": 40.0,
+  "min_fixed_budget_usd": 100.0,
+  "job_success_score": 94,
+  "jobs_completed": 29,
+  "availability_hours_per_week": 25,
+  "weekly_connects_budget": 80,
+  "priors_from": {
+    "hourly_rate_usd": "p75 contract hourly rate, Web & Full-Stack Development, freelance_contracts_1_3m",
+    "min_fixed_budget_usd": "p25 posted fixed budget, Web & Full-Stack Development, upwork_all_jobs_200k",
+    "job_success_score": "p75 job_success_rate, Web Development with portfolio, sarveshchhetri/freelancer-success-earnings-and-churn-prediction",
+    "jobs_completed": "median total_jobs_completed, same subset, sarveshchhetri/freelancer-success-earnings-and-churn-prediction"
+  },
+  "provenance": {
+    "source": "synthetic",
+    "source_dataset": "generator",
+    "generator": "synth.personas@1.0.0",
+    "derived_from": null,
+    "synthetic_fields": []
+  }
+}

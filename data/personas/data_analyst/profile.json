@@ -1,0 +1,47 @@
+{
+  "persona": "data_analyst",
+  "name": "Hira Baig",
+  "headline": "Data Analyst | SQL, Power BI and Python for decision-ready reporting",
+  "location": "Karachi, Pakistan (remote, overlaps UK/EU business hours)",
+  "years_experience": 4,
+  "category": "Data Analysis & BI",
+  "core_skills": [
+    "SQL",
+    "Power BI",
+    "Excel",
+    "Python",
+    "pandas",
+    "Tableau",
+    "dbt",
+    "BigQuery",
+    "Data Visualization",
+    "Statistics",
+    "ETL",
+    "Looker"
+  ],
+  "does_not_do": [
+    "SAS Viya",
+    "Qlik Sense",
+    "Alteryx",
+    "SPSS Modeler"
+  ],
+  "hourly_rate_usd": 50.0,
+  "min_fixed_budget_usd": 100.0,
+  "job_success_score": 94,
+  "jobs_completed": 29,
+  "availability_hours_per_week": 30,
+  "weekly_connects_budget": 80,
+  "priors_from": {
+    "hourly_rate_usd": "p75 contract hourly rate, Data Analysis & BI, freelance_contracts_1_3m",
+    "min_fixed_budget_usd": "p25 posted fixed budget, Data Analysis & BI, upwork_all_jobs_200k",
+    "job_success_score": "p75 job_success_rate, Data Science & Analytics with portfolio, sarveshchhetri/freelancer-success-earnings-and-churn-prediction",
+    "jobs_completed": "median total_jobs_completed, same subset, sarveshchhetri/freelancer-success-earnings-and-churn-prediction"
+  },
+  "provenance": {
+    "source": "synthetic",
+    "source_dataset": "generator",
+    "generator": "synth.personas@1.0.0",
+    "derived_from": null,
+    "synthetic_fields": []
+  }
+}
