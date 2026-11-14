@@ -1,0 +1,6 @@
+{
+ "about": "Thresholds for the 30-job smoke evaluation (evals/runners/smoke_gate.py). Set below the step-7 measurements with room for sampling noise: decisions F1 0.875 on 29 jobs, unsupported-claim rate of first drafts 0.10-0.2 (evals/results/summary.json).",
+ "min_jobs": 27,
+ "min_bid_or_skip_f1": 0.75,
+ "max_unsupported_rate_first_draft": 0.3
+}

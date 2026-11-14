@@ -35,6 +35,8 @@ dependencies = [
 
 [project.optional-dependencies]
 dev = ["pytest==9.2.0", "pytest-asyncio==1.5.0", "ruff==0.15.4", "mypy"]
+# step 7, R&D question C baselines (evals/runners/baselines.py)
+evals = ["langchain-openai==1.8.0", "langgraph-supervisor==0.0.31", "tiktoken==0.14.0"]
 # data/pipeline: builds the GigSim dataset from Kaggle sources (make data)
 data = [
   "kaggle==2.2.5",

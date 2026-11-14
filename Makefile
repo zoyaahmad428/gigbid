@@ -1,4 +1,4 @@
-.PHONY: install api worker up down logs ps image gate deploy-dry web-install web web-build web-test api-test test lint eval data-download seed data-validate gigsim gigsim-test mcp-portfolio mcp-marketplace mcp-workspace mcp-test snapshots rag-eval verify-eval rag-suite graphs demo agent-test
+.PHONY: install api worker up down logs ps image gate deploy-dry eval-b eval-c eval-a eval-injection judge-label judge x2 smoke web-install web web-build web-test api-test test lint eval data-download seed data-validate gigsim gigsim-test mcp-portfolio mcp-marketplace mcp-workspace mcp-test snapshots rag-eval verify-eval rag-suite graphs demo agent-test
 install:
 	python -m pip install -e ".[dev]"
 
@@ -53,8 +53,41 @@ test:
 lint:
 	ruff check .
 
-eval:
-	python -m evals.runners.run_demo_eval
+# ---- Evaluations (step 7; docs/EVALUATION.md). LLM runs need the key; all are resumable.
+eval:         # E2: retrieval + rules gate, decision metrics, fixed GigSim reply-rate run, tables
+	python -m evals.runners.ci_gate
+	python -m evals.runners.graph_runs --set decisions --stop writer --tag decisions
+	python -m evals.runners.outcomes --runs prop_v0_naive prop_combined
+	python -m evals.runners.report
+
+eval-b:       # R&D question B: V0 vs shipped retriever, same analysis and writer
+	python -m evals.runners.proposal_variants --variant v0_naive --profile open_qwen --per-persona 4
+	python -m evals.runners.proposal_variants --variant combined --profile open_qwen --per-persona 4
+
+eval-c:       # R&D question C: ReAct agent, prebuilt supervisor, our graph (same model)
+	python -m evals.runners.baselines --system react
+	python -m evals.runners.baselines --system supervisor
+	python -m evals.runners.graph_runs --set c --profile open_20b --fork-from decisions --tag c_graph
+
+eval-a:       # R&D question A: tool granularity (40 tasks x 3 tool sets)
+	python -m evals.runners.tool_study
+
+eval-injection:
+	python -m evals.runners.injection_eval --profile open_qwen
+
+judge-label:  # label the 30 calibration items yourself, then: make judge
+	python -m evals.runners.judge --build
+	python -m evals.runners.label
+
+judge:
+	python -m evals.runners.judge --score --all-drafts --kappa
+
+x2:           # signature extension: pricing A/B in GigSim with a McNemar test
+	python -m evals.runners.outcomes --x2
+
+smoke:        # E2's 30-job smoke evaluation with thresholds
+	python -m evals.runners.graph_runs --set smoke --stop critic --tag smoke
+	python -m evals.runners.smoke_gate
 
 # ---- GigSim dataset (data/pipeline) -------------------------------------
 data-download:

@@ -52,6 +52,18 @@ models:
         client_liaison: qwen/qwen3.8-27b
       fallback: openai/gpt-oss-20b
       injection_classifier: meta-llama/llama-prompt-guard-2-86m
+    open_20b:                     # evaluation only: every node on gpt-oss-20b (R&D question C, same model for all systems)
+      provider: groq
+      nodes:
+        analyst: openai/gpt-oss-20b
+        risk_assessor: openai/gpt-oss-20b
+        compliance: openai/gpt-oss-20b
+        liaison_intent: openai/gpt-oss-20b
+        writer: openai/gpt-oss-20b
+        critic: openai/gpt-oss-20b
+        client_liaison: openai/gpt-oss-20b
+      fallback: openai/gpt-oss-20b
+      injection_classifier: meta-llama/llama-prompt-guard-2-86m
   temperature:
     default: 0.2
     writer: 0.5
@@ -79,6 +91,13 @@ budgets:
   max_tokens_per_job: 40000
   max_tokens_per_conversation_turn: 15000
   max_runs_per_user_per_day: 25   # new bid/reply runs per user per day (API and scout); 0 = no limit
+  # E5 declared service levels (2026-11-14), open profile on Groq, excluding provider rate-limit pauses.
+  # The report compares measured values with these (evals/results/summary.json, "budgets").
+  declared:
+    job_analysed_p95_s: 45        # load job -> parallel analyses -> decision -> pricing
+    job_analysed_usd: 0.003
+    proposal_p95_s: 120           # job analysed + writer, verifier, critic, compliance, up to approval
+    proposal_usd: 0.01
 
 worker:                           # worker/ (Arq on Redis); schedules use the real clock
   scout_every_minutes: 30         # look for new jobs for users who turned on auto-scout
