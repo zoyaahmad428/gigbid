@@ -150,8 +150,8 @@ def validate(cfg: dict | None = None) -> list[str]:
         for x in dev:
             if any(e.startswith("prop_") for e in x["relevant_evidence"]):
                 probs.append(f"dev_{p}: proposal listed as gold evidence"); break
-            if len(x["relevant_evidence"]) > 5 or not set(x["relevant_evidence"]) <= set(x["evidence_grades"]):
-                probs.append(f"dev_{p}: gold list longer than 5 or not graded"); break
+            if not set(x["relevant_evidence"]) <= {e for e, g in x["evidence_grades"].items() if g == 2}:
+                probs.append(f"dev_{p}: gold evidence not graded 2"); break
             if not set(x["relevant_evidence"]) <= evids:
                 probs.append(f"dev_{p}: gold evidence id not in index"); break
             if x["gold_action"] == "bid" and not x["relevant_projects"]:

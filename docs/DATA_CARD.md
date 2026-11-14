@@ -31,6 +31,7 @@ results on that set.
 | Live-stream labels | `data/gigsim/_hidden/live_labels.jsonl` | 488 | n/a | n/a |
 | Market price statistics | `data/gigsim/market_stats.json` | 4 categories | all | 0 |
 | Scam lexicon (statistics only) | `data/gigsim/scam_lexicon.json` | 60 phrases | all | 0 |
+| Technology vocabulary | `rag/tech_terms.json` | 229 terms | all | 0 |
 | Persona corpora | `data/personas/{ai_ml,fullstack,data_analyst}/` | see §6 | 0 | all |
 | Dev set | `evals/datasets/dev_{persona}.jsonl` | 200 per persona | 172 jobs each | 28 jobs each |
 
@@ -91,6 +92,15 @@ Both datasets have titles only, so their category comes from skills in the title
 fraudulent ads (smoothed log-odds). 10,000 of the 10,757 fraudulent rows follow one machine-generated
 template, so they were counted and excluded. One ad per company was kept, to stop boilerplate
 dominating. 603 fraudulent and 11,399 genuine ads remained. Only phrases and counts are published.
+
+**Technology vocabulary** (`clean/tech_terms.py`). The claim verifier uses it to notice a draft naming
+a technology that no evidence mentions ("built with Kotlin"), including technologies outside the
+57-skill persona taxonomy. It comes from the real skill tags (`Category_1..9`) of the Upwork 60k
+dataset. A tag is kept if it is used on at least 20 jobs, has at most 3 words, and job descriptions
+write it in its tagged capitalisation at least 70% of the times it appears. Technology names are
+proper nouns ("We use Flutter"), while generic tags such as "Market Research" mostly appear in lower
+case. Tags containing `.`, `+` or `#` (Node.js, C++, .NET) are always kept, and natural languages are
+always dropped. 229 of 1,242 candidate tags remain. Only the tag names are published.
 
 ## 5. Provenance tagging
 

@@ -9,6 +9,7 @@
 from __future__ import annotations
 
 import datetime as dt
+import math
 import random
 import sys
 from pathlib import Path
@@ -323,24 +324,40 @@ TYPE_PRIORITY = {"case_study": 4, "code": 3, "readme": 2, "review": 1, "cv": 0}
 
 
 def relevant_for(job: dict, corpus: dict) -> tuple[list[str], list[str], dict[str, int]]:
+    """Gold evidence for a bid job.
+
+    A project's relevance is its skill overlap with the job (named or implied
+    skills), each skill weighted by rarity across this persona's projects
+    (log(N/df)), so "Python", which nearly every AI project has, counts for little.
+    Grade 2: every project within 80% of the best score (ties are *all* relevant;
+    an earlier version broke ties by recency, which no retriever can reproduce).
+    Grade 1: projects within 40%, and the CV when it names a job skill.
+    `relevant_evidence` lists the grade-2 projects' documents, case studies first;
+    Recall@5 is computed against min(5, len(gold)).
+    """
     js = set(job["skills"])
-    scored = []
-    for p in corpus["projects"]:
-        ov = len(js & (set(p["skills"]) | set(p["implied_skills"])))
-        if ov:
-            scored.append((ov, p["end"], p["project_id"]))
-    scored.sort(reverse=True)
-    top = [pid for ov, _, pid in scored if ov >= max(1, scored[0][0] - 1)][:3] if scored else []
-    # Gold = portfolio evidence only. Past proposals stay retrievable (V4 uses them)
-    # but are not evidence that the persona did the work. Items of the top projects
-    # are ranked by how many job skills they cover (named or implied), then by
-    # project rank and document type; the best five are the gold list.
+    projects = corpus["projects"]
+    n = len(projects)
+    df: dict[str, int] = {}
+    for p in projects:
+        for sk in set(p["skills"]) | set(p["implied_skills"]):
+            df[sk] = df.get(sk, 0) + 1
+    w = {sk: math.log((n + 1) / (c + 0.5)) for sk, c in df.items()}
+    scored = sorted(((sum(w[sk] for sk in js & (set(p["skills"]) | set(p["implied_skills"]))), p["project_id"])
+                     for p in projects), reverse=True)
+    best = scored[0][0] if scored else 0.0
+    if best <= 0:
+        return [], [], {}
+    top = [pid for sc, pid in scored if sc >= 0.8 * best]
+    near = [pid for sc, pid in scored if 0.4 * best <= sc < 0.8 * best]
     rank = {pid: i for i, pid in enumerate(top)}
     items = [e for e in corpus["evidence"] if e["project_id"] in rank and e["type"] != "proposal"]
-    items.sort(key=lambda e: (-len(js & (set(e["skills"]) | set(e["skills_implied"]))),
-                              rank[e["project_id"]], -TYPE_PRIORITY[e["type"]], e["evidence_id"]))
-    gold = [e["evidence_id"] for e in items[:5]]
-    grades = {e["evidence_id"]: (2 if e["evidence_id"] in gold else 1) for e in items}
+    items.sort(key=lambda e: (rank[e["project_id"]], -TYPE_PRIORITY[e["type"]], e["evidence_id"]))
+    gold = [e["evidence_id"] for e in items]
+    grades = {e: 2 for e in gold}
+    for e in corpus["evidence"]:
+        if e["project_id"] in near and e["type"] != "proposal":
+            grades[e["evidence_id"]] = 1
     if js & set(corpus["profile"]["core_skills"]):
         for e in corpus["evidence"]:
             if e["type"] == "cv":

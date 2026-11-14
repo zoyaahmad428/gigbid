@@ -113,6 +113,13 @@ def main() -> None:
         "note": "aggregate n-gram statistics only; no source text is redistributed"}})
     report["scam_lexicon"] = lobj["meta"]
 
+    # 3b. technology vocabulary for claim verification (rag/tech_terms.json) ---
+    from clean.tech_terms import OUT as TECH_OUT, build as build_tech_terms
+    if args.refresh or not TECH_OUT.exists():
+        log("building technology vocabulary from Upwork 60k skill tags (~4 min)")
+        TECH_OUT.write_text(json.dumps(build_tech_terms(), indent=1) + "\n")
+    report["tech_terms"] = len(json.loads(TECH_OUT.read_text())["terms"])
+
     # 4. selection -----------------------------------------------------------
     sel = gigsim.select_jobs(pool, cfg, rng(cfg, "select"))
     ctable = gigsim.connects_table(pool)

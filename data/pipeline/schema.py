@@ -139,6 +139,6 @@ class DevItem(BaseModel):
     is_scam: bool
     has_injection: bool
     relevant_projects: list[str]               # project_ids, best first
-    relevant_evidence: list[str]               # top <=5 evidence_ids, best first (Recall@5 can reach 1.0)
-    evidence_grades: dict[str, int] = Field(default_factory=dict)  # graded relevance for nDCG: 2 top, 1 related
+    relevant_evidence: list[str]               # documents of the grade-2 projects, case studies first
+    evidence_grades: dict[str, int] = Field(default_factory=dict)  # graded relevance for nDCG: 2 relevant, 1 related
     fair_price_band: Budget
