@@ -1,3 +1,150 @@
-# TODO: Define web, API, worker, MCP servers, GigSim, Postgres, Redis,
-# vector store and local model service as appropriate.
-services: {}
+# GigBid stack:  docker compose -f infra/docker-compose.yml up --build      (make up)
+#
+#   web + api   http://localhost:8000   FastAPI serves the built React app and /api
+#   worker      Arq: runs graph threads, scouts for jobs, reads marketplace events
+#   gigsim      http://localhost:8081   the simulated marketplace (admin endpoints for demos)
+#   postgres    checkpoints (thread state) and the long-term memory store
+#   redis       the worker's queue (append-only file, so queued jobs survive a restart)
+#   mcp-*       optional, `--profile mcp`: the three MCP servers over Streamable HTTP for
+#               MCP Inspector or another client. The agents call the same servers in-process.
+#
+# Secrets (OPENAI_API_KEY = the Groq key, LANGFUSE_*) come from ../.env, which is not in Git.
+
+name: gigbid
+
+x-app: &app
+  build:
+    context: ..
+    dockerfile: infra/docker/Dockerfile
+  image: gigbid:local
+  env_file:
+    - path: ../.env
+      required: false
+  restart: unless-stopped
+
+x-env: &env
+  DATABASE_URL: postgresql://gigbid:gigbid@postgres:5432/gigbid
+  REDIS_URL: redis://redis:6379/0
+  GIGSIM_BASE_URL: http://gigsim:8081
+  GIGBID_DB: auto
+  GIGBID_RUNNER: worker
+  MARKETPLACE_MODE: gigsim
+
+services:
+  postgres:
+    image: postgres:16.6-alpine
+    environment:
+      POSTGRES_USER: gigbid
+      POSTGRES_PASSWORD: gigbid
+      POSTGRES_DB: gigbid
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U gigbid -d gigbid"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    restart: unless-stopped
+
+  redis:
+    image: redis:7.4.1-alpine
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - redisdata:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    restart: unless-stopped
+
+  gigsim:
+    <<: *app
+    command: ["uvicorn", "gigsim.app:app", "--host", "0.0.0.0", "--port", "8081"]
+    environment:
+      GIGSIM_CHAOS: ${GIGSIM_CHAOS:-1}
+    ports:
+      - "8081:8081"
+    volumes:
+      - gigsimstate:/app/gigsim/state
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8081/health', timeout=3)"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+
+  gigsim-init:                               # one-shot: a fresh simulator gets ~3 days of open jobs
+    <<: *app
+    command: ["python", "infra/docker/gigsim_warm.py"]
+    environment:
+      GIGSIM_BASE_URL: http://gigsim:8081
+      GIGSIM_WARM_START_HOURS: ${GIGSIM_WARM_START_HOURS:-72}
+    restart: "no"
+    depends_on:
+      gigsim: {condition: service_healthy}
+
+  api:
+    <<: *app
+    environment:
+      <<: *env
+      GIGBID_ALLOW_SIGNUP: ${GIGBID_ALLOW_SIGNUP:-true}
+      GIGBID_SEED_USERS: ${GIGBID_SEED_USERS:-}
+    ports:
+      - "8000:8000"
+    volumes:
+      - appdata:/app/data/processed
+    depends_on:
+      postgres: {condition: service_healthy}
+      redis: {condition: service_healthy}
+      gigsim: {condition: service_healthy}
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/api/health', timeout=3)"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+
+  worker:
+    <<: *app
+    command: ["arq", "worker.main.WorkerSettings"]
+    environment:
+      <<: *env
+    volumes:
+      - appdata:/app/data/processed          # shares the app store and traces with the API
+    depends_on:
+      postgres: {condition: service_healthy}
+      redis: {condition: service_healthy}
+      gigsim: {condition: service_healthy}
+    stop_grace_period: 30s                   # Arq hands an unfinished job back to the queue on SIGTERM
+
+  mcp-portfolio:
+    <<: *app
+    profiles: ["mcp"]
+    command: ["python", "-m", "mcp_servers.portfolio.server", "--http", "--host", "0.0.0.0", "--port", "8201"]
+    environment:
+      PORTFOLIO_USERS: ${PORTFOLIO_USERS:-dev-portfolio-ai=dev_ai:ai_ml}
+    ports: ["8201:8201"]
+
+  mcp-marketplace:
+    <<: *app
+    profiles: ["mcp"]
+    command: ["python", "-m", "mcp_servers.marketplace.server", "--http", "--host", "0.0.0.0", "--port", "8202"]
+    environment:
+      GIGSIM_BASE_URL: http://gigsim:8081
+      MARKETPLACE_USERS: ${MARKETPLACE_USERS:-dev-mkt-ai=dev_ai:ai_ml:dev-token-ai-ml}
+    ports: ["8202:8202"]
+    depends_on:
+      gigsim: {condition: service_healthy}
+
+  mcp-workspace:
+    <<: *app
+    profiles: ["mcp"]
+    command: ["python", "-m", "mcp_servers.workspace.server", "--http", "--host", "0.0.0.0", "--port", "8203"]
+    environment:
+      WORKSPACE_USERS: ${WORKSPACE_USERS:-dev-ws-ai=dev_ai}
+    ports: ["8203:8203"]
+
+volumes:
+  pgdata:
+  redisdata:
+  gigsimstate:
+  appdata:

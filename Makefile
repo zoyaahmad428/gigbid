@@ -1,9 +1,35 @@
-.PHONY: install api web-install web web-build web-test api-test test lint eval data-download seed data-validate gigsim gigsim-test mcp-portfolio mcp-marketplace mcp-workspace mcp-test snapshots rag-eval verify-eval rag-suite graphs demo agent-test
+.PHONY: install api worker up down logs ps image gate deploy-dry web-install web web-build web-test api-test test lint eval data-download seed data-validate gigsim gigsim-test mcp-portfolio mcp-marketplace mcp-workspace mcp-test snapshots rag-eval verify-eval rag-suite graphs demo agent-test
 install:
 	python -m pip install -e ".[dev]"
 
 api:
 	uvicorn apps.api.main:app --reload --port 8000
+
+worker:       # Arq worker (needs Redis at REDIS_URL); start the API with GIGBID_RUNNER=worker to use it
+	arq worker.main.WorkerSettings
+
+# ---- Docker (step 6): postgres, redis, gigsim, api (+ web), worker; `--profile mcp` adds the MCP servers
+up:
+	docker compose -f infra/docker-compose.yml up --build -d
+	@echo "GigBid: http://localhost:8000   GigSim: http://localhost:8081"
+
+down:
+	docker compose -f infra/docker-compose.yml down
+
+logs:
+	docker compose -f infra/docker-compose.yml logs -f --tail=100 api worker
+
+ps:
+	docker compose -f infra/docker-compose.yml ps
+
+image:
+	docker build -f infra/docker/Dockerfile -t gigbid:local .
+
+gate:         # the CI evaluation gate (offline): retrieval, injection/scam rules, claim verification
+	python -m evals.runners.ci_gate
+
+deploy-dry:   # build the Hugging Face Space folder without pushing (see docs/RUNBOOK.md, "Deploy")
+	infra/deploy/hf_space.sh $${SPACE:-you/gigbid} --dry-run
 
 # ---- Web app (apps/web): React + TypeScript + Vite
 web-install:

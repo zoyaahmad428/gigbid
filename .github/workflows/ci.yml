@@ -1,13 +1,141 @@
 name: CI
-on: [push, pull_request]
+
+# Every push and pull request: lint, all tests (SQLite, plus Postgres and Redis services for the
+# checkpointer and the worker queue), the offline evaluation gate, the web app's type check,
+# lint, build and browser tests, and a build of the Docker image. No secrets are needed.
+
+on:
+  push:
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  PYTHON_VERSION: "3.12"
+  NODE_VERSION: "22"
+  RAG_MODEL_CACHE: ${{ github.workspace }}/.models
+
 jobs:
-  checks:
-    runs-on: ubuntu-latest
+  python:
+    name: Lint and tests
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    services:
+      postgres:
+        image: postgres:16.6-alpine
+        env:
+          POSTGRES_USER: gigbid
+          POSTGRES_PASSWORD: gigbid
+          POSTGRES_DB: gigbid
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U gigbid" --health-interval 5s --health-timeout 3s --health-retries 20
+      redis:
+        image: redis:7.4.1-alpine
+        ports: ["6379:6379"]
+        options: >-
+          --health-cmd "redis-cli ping" --health-interval 5s --health-timeout 3s --health-retries 20
+    env:
+      GIGSIM_CHAOS: "0"
+      GIGBID_DB: sqlite
+      GIGBID_TEST_POSTGRES_URL: postgresql://gigbid:gigbid@localhost:5432/gigbid
+      GIGBID_TEST_REDIS_URL: redis://localhost:6379/0
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
-          python-version: "3.11"
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+          cache-dependency-path: pyproject.toml
+      - uses: actions/cache@v4
+        with:
+          path: .models
+          key: models-${{ hashFiles('agent/config.yaml') }}
       - run: python -m pip install -e ".[dev]"
       - run: ruff check .
-      - run: pytest -q
+      - name: Tests (unit, contract, integration, GigSim, MCP servers; worker on Postgres + Redis)
+        run: python -m pytest -q tests gigsim mcp_servers
+
+  eval-gate:
+    name: Evaluation gate
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+          cache-dependency-path: pyproject.toml
+      - uses: actions/cache@v4
+        with:
+          path: .models
+          key: models-${{ hashFiles('agent/config.yaml') }}
+      - run: python -m pip install -e ".[dev]"
+      - name: Retrieval, injection and scam rules, claim verification vs evals/baselines/ci_gate.json
+        run: python -m evals.runners.ci_gate
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: ci-gate
+          path: evals/results/ci_gate.json
+
+  web:
+    name: Web app
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: apps/web
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run build             # tsc -b, then vite build
+      - run: npx playwright install --with-deps chromium
+      - run: npx playwright test
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-report
+          path: apps/web/test-results
+
+  docker:
+    name: Docker image
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: infra/docker/Dockerfile
+          tags: gigbid:ci
+          load: true
+          push: false
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+      - name: Compose file is valid
+        run: docker compose -f infra/docker-compose.yml config --quiet
+      - name: Smoke test (single container, no LLM key needed for these routes)
+        run: |
+          docker run -d --name gigbid -p 7860:7860 -e GIGBID_SEED_USERS=ci@example.com:ci-password-1:ai_ml gigbid:ci infra/docker/start-all.sh
+          for i in $(seq 1 60); do curl -fsS localhost:7860/api/health && break; sleep 2; done
+          curl -fsS localhost:7860/ | grep -q "<title>GigBid</title>"
+          TOKEN=$(curl -fsS -X POST localhost:7860/api/auth/login -H 'content-type: application/json' \
+            -d '{"email":"ci@example.com","password":"ci-password-1"}' | python3 -c "import json,sys;print(json.load(sys.stdin)['token'])")
+          curl -fsS localhost:7860/api/jobs -H "authorization: Bearer $TOKEN" | python3 -c "import json,sys;d=json.load(sys.stdin);assert d['jobs'], d"
+          curl -fsS localhost:7860/api/account -H "authorization: Bearer $TOKEN"
+      - if: always()
+        run: docker logs gigbid 2>&1 | tail -60
