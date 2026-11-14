@@ -15,10 +15,19 @@ from __future__ import annotations
 import re
 import secrets
 
+_AI = r"\b(ai|llm|bots?|assistants?|language models?|agents?)"
 PATTERNS = [
     r"ignore (all|any|the)? ?(previous|prior|above) (instructions|rules|prompts?)",
-    r"\b(ai|llm|bot|assistant|language model|agent)s?\b[^.\n]{0,40}\b(must|should|need to|are required to|"
-    r"include|write|start|end|set|put|submit|send|tell|say|claim|rate|mark|recommend|bid)\b",
+    # Instructions *addressed* to a model ("Bots: put...", "AI writers: claim...", "Assistant, tell...",
+    # "AI tools reading this:"), not job requirements that describe one ("the AI bot should support OCR").
+    # The descriptive form was 8 of 8 false positives on the dev set (evals/results/injection_regex.json).
+    _AI + r"(\s+(writers?|tools?|assistants?|models?|agents?|check))?\s*[:,]\s*(\w+\s+)?(must|should|please|"
+    r"include|write|start|end|set|put|submit|send|tell|say|claim|rate|mark|recommend|bid|ignore|add|mention)\b",
+    _AI + r"(\s+(writers?|tools?|assistants?|models?|agents?))?\s+(reading|processing|parsing|reviewing|screening) "
+    r"this\b",
+    r"\b(for|attention|dear|note to)\s+(all\s+)?" + _AI[2:] + r"(\s+(writers?|tools?|assistants?|models?|agents?))?"
+    r"\s*[:,]",
+    r"\byour\s+(ai\s+)?(assistant|agent|bot|tool)\s+(must|should|needs? to)\b",
     r"\bif you are (an? )?(ai|bot|language model|agent|assistant)\b",
     r"<\|?(im_start|system|endoftext)\|?>|\[system\]|###\s*system",
     r"\b(skip|bypass|disable)\b[^.\n]{0,30}\b(compliance|review|approval|guard|check)",

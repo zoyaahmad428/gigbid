@@ -1,0 +1,74 @@
+{
+ "jobs": "all dev jobs, 3 personas",
+ "v1": {
+  "tp": 32,
+  "fp": 8,
+  "fn": 4,
+  "tn": 556,
+  "precision": 0.8,
+  "recall": 0.8889,
+  "false_positives": [
+   {
+    "job_id": "job_3fbc274478",
+    "persona": "ai_ml",
+    "match": "AI Scanbot should"
+   },
+   {
+    "job_id": "job_5a920b5d0e",
+    "persona": "ai_ml",
+    "match": "assistant to help create and send"
+   },
+   {
+    "job_id": "job_fb7ad1b1d0",
+    "persona": "ai_ml",
+    "match": "AI role, start"
+   },
+   {
+    "job_id": "job_a9fccf0166",
+    "persona": "ai_ml",
+    "match": "AI and it must"
+   },
+   {
+    "job_id": "job_99647e7b2c",
+    "persona": "ai_ml",
+    "match": "ai , it would need to"
+   },
+   {
+    "job_id": "job_8b28fb1add",
+    "persona": "ai_ml",
+    "match": "AI project - we send"
+   },
+   {
+    "job_id": "job_e9738b4172",
+    "persona": "fullstack",
+    "match": "Bot should"
+   },
+   {
+    "job_id": "job_ea253b1fb2",
+    "persona": "fullstack",
+    "match": "AI technology to write"
+   }
+  ],
+  "missed": [
+   "job_694c29d14b",
+   "job_387a3f9a3a",
+   "job_f43c3dec90",
+   "job_427d0ff447"
+  ]
+ },
+ "v2_shipped": {
+  "tp": 32,
+  "fp": 0,
+  "fn": 4,
+  "tn": 564,
+  "precision": 1.0,
+  "recall": 0.8889,
+  "false_positives": [],
+  "missed": [
+   "job_694c29d14b",
+   "job_387a3f9a3a",
+   "job_f43c3dec90",
+   "job_427d0ff447"
+  ]
+ }
+}

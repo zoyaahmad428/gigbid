@@ -1,7 +1,7 @@
 {
  "injection": {
   "recall": 0.8889,
-  "false_positive_rate": 0.0142,
+  "false_positive_rate": 0.0,
   "n_positive": 36,
   "n_negative": 564
  },
@@ -28,5 +28,5 @@
   "true_claims_removed": 0.0,
   "not_a_claim_accuracy": 1.0
  },
- "seconds": 23.0
+ "seconds": 22.5
 }
