@@ -619,6 +619,27 @@ def proposal_features(proposal_id: str) -> dict:
     return json.loads(p["features"] or "{}")
 
 
+class ClientMessageIn(BaseModel):
+    text: str = Field(min_length=1, max_length=4000)
+    intent: Literal["question", "interview_request", "negotiation", "scam"] = "question"
+
+
+@app.post("/admin/proposals/{proposal_id}/client_message", dependencies=[Depends(admin)])
+def inject_client_message(proposal_id: str, body: ClientMessageIn) -> dict:
+    """For demos and UI tests: deliver a client message now, through the same scheduled-event path
+    as a simulated reply. The simulated reply rate is realistic (roughly 1 in 8 strong proposals),
+    so waiting for a natural reply makes a demo depend on luck. Evaluations never call this."""
+    with STATE.lock:
+        p = STATE.db.execute("SELECT status FROM proposals WHERE proposal_id=?", (proposal_id,)).fetchone()
+    if not p:
+        raise HTTPException(404, "proposal not found")
+    if p["status"] in {"draft", "lost", "withdrawn", "hired"}:
+        raise HTTPException(409, f"proposal is {p['status']}")
+    STATE.schedule(proposal_id, STATE.now(), [(0.0, "client_message", body.model_dump())])
+    tick()
+    return {"proposal_id": proposal_id, "delivered": True}
+
+
 class ConnectsIn(BaseModel):
     balance: int = Field(ge=0, le=100_000)
 

@@ -66,6 +66,7 @@ Admin endpoints (header `X-Admin-Token`):
 | `POST /admin/clock {"advance_hours": 24}` | Advance the clock (also accepts `set_to` and `speed`) |
 | `GET /admin/metrics` | Reply, hire, strike and injection counts per account |
 | `POST /admin/accounts/{id}/connects` | Top up Connects for eval runs. **Do it again after advancing the clock past a Monday**: the weekly refill resets the balance. |
+| `POST /admin/proposals/{id}/client_message {"text", "intent"}` | Deliver a client message now, through the normal event path. For demos and UI tests only: the simulated reply rate is realistic (about 1 in 8 strong proposals), so a demo should not wait on luck. Evaluations never call it. |
 | `POST /admin/reset` | Clear all state |
 
 ## Simulated clients (`client_sim.py`)

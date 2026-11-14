@@ -183,3 +183,18 @@ def test_same_proposal_same_client_decision(mod):
     a = client_sim.plan_for_submission(1, "key", j, h, LETTER, [], 100, mod.CFG["client_model"])
     b = client_sim.plan_for_submission(1, "key", j, h, LETTER, [], 100, mod.CFG["client_model"])
     assert a.outcome == b.outcome and a.events == b.events
+
+
+def test_admin_can_deliver_a_client_message_for_demos(c, mod):
+    j = _job(mod, scam=False)
+    d = c.post("/v1/proposals", headers=AI, json={"job_id": j["job_id"], "cover_letter": LETTER,
+                                                  "bid_amount": 100, "bid_type": j["budget"]["type"],
+                                                  "screening_answers": _answers(j)}).json()
+    url = f"/admin/proposals/{d['proposal_id']}/client_message"
+    body = {"intent": "interview_request", "text": "Could we have a call?"}
+    assert c.post(url, headers=ADMIN, json=body).status_code == 409             # still a draft
+    c.post(f"/v1/proposals/{d['proposal_id']}/submit", headers={**AI, "Idempotency-Key": "k2"})
+    assert c.post(url, json=body).status_code == 403                             # admin only
+    assert c.post(url, headers=ADMIN, json=body).json()["delivered"] is True
+    p = c.get(f"/v1/proposals/{d['proposal_id']}", headers=AI).json()
+    assert p["status"] == "interview" and p["messages"][-1]["text"] == "Could we have a call?"
