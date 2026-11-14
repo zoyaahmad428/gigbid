@@ -27,7 +27,7 @@ from agent.settings import config
 from agent.trace import TRACES
 
 ALLOWLIST: dict[str, set[str]] = {
-    "scout": {"search_jobs", "get_job", "marketplace_status"},
+    "scout": {"search_jobs", "get_job", "marketplace_status", "list_proposals"},
     "analyst": set(),
     "risk_assessor": {"get_job", "get_client_history"},
     "fit_matcher": {"search_evidence", "get_evidence", "list_skills"},

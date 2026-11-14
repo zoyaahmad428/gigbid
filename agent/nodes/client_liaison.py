@@ -68,7 +68,7 @@ async def draft_reply(state: dict) -> dict:
         ev_text = "\n".join(f"[{h['evidence_id']}] {h['title']}: {h['snippet']}" for h in hits) or "none"
     floor = user.get("hourly_rate") if prop["bid_type"] == "hourly" else user.get("min_fixed_budget")
     r, u = await to_thread(structured, "client_liaison", Reply, {
-        "floor": floor or prop["bid_amount"], "slots": [s["start"] for s in state.get("slots", [])] or "none",
+        "floor": floor or prop["bid_amount"], "slots": [human_slot(s["start"]) for s in state.get("slots", [])] or "none",
         "intent": it["intent"], "asks": it.get("asks", []), "job_title": state["job"]["title"],
         "bid": f"${prop['bid_amount']:g} {prop['bid_type']}", "evidence": ev_text,
         "history": wrap("conversation", _history(state["messages"]))})
@@ -121,6 +121,17 @@ async def send(state: dict) -> dict:
             "start": s["start"], "duration_minutes": 30, "title": f"Interview: {state['job']['title'][:80]}",
             "idempotency_key": _key(state["thread_id"], "hold", n)})
     return {"sent": res, "hold": hold, "status": "replied", "status_reason": "reply sent"}
+
+
+def human_slot(start: str, minutes: int = 30) -> str:
+    """'2026-11-16T09:00:00+05:00' -> 'Mon 16 Nov, 09:00-09:30 (UTC+5)'. Raw ISO strings reached
+    clients in the first UI test of the reply flow."""
+    import datetime as dt
+    t = dt.datetime.fromisoformat(start)
+    off = t.utcoffset() or dt.timedelta(0)
+    h, m = divmod(abs(int(off.total_seconds())) // 60, 60)
+    tz = f"UTC{'+' if off >= dt.timedelta(0) else '-'}{h}" + (f":{m:02d}" if m else "")
+    return f"{t:%a} {t.day} {t:%b}, {t:%H:%M}-{t + dt.timedelta(minutes=minutes):%H:%M} ({tz})"
 
 
 def _key(*parts: str) -> str:

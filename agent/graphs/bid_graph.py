@@ -34,6 +34,13 @@ PARALLEL = ["analyst", "risk_assessor", "fit_matcher"]
 async def load_job(state: dict) -> dict:
     """The Scout hands in a job id; load the job through the Marketplace server."""
     job = state.get("job") or await tools().call("scout", "get_job", {"job_id": state["job_id"]})
+    # One proposal per job on the marketplace. Found in the first UI test: a job applied to in an
+    # earlier thread was drafted again and only failed at submit, after the human had approved it.
+    mine = await tools().call("scout", "list_proposals", {})
+    prior = next((p for p in mine.get("proposals", []) if p["job_id"] == job["job_id"]), None)
+    if prior:
+        return {"job": job, "status": "skipped",
+                "status_reason": f"You already have a proposal for this job ({prior['proposal_id']}, {prior['status']})"}
     return {"job": job, "status": "running", "status_reason": "analysing"}
 
 

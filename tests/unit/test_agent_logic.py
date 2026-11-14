@@ -158,3 +158,34 @@ def test_budget_floor_skips_but_unknown_budget_does_not():
     assert run(decide(_state(job={"budget": {"type": "hourly", "max": 35}}, user=user)))["decision"]["action"] == "bid"
     assert run(decide(_state(job={"budget": {"type": "fixed", "max": 300}}, user=user)))["decision"]["action"] == "skip"
     assert run(decide(_state(job={"budget": {"type": "fixed"}}, user=user)))["decision"]["action"] == "bid"
+
+
+def test_job_already_applied_to_is_skipped_before_any_llm_call():
+    """Regression (found in the first UI run): a job applied to in an earlier thread was drafted again
+    and only failed at submit, after the human had approved it."""
+    import asyncio
+
+    from agent.graphs.bid_graph import load_job
+    from agent.nodes import base
+
+    class Tools:
+        async def call(self, agent, tool, args=None):
+            if tool == "get_job":
+                return {"job_id": "job_1", "title": "x"}
+            if tool == "list_proposals":
+                return {"proposals": [{"proposal_id": "prop_9", "job_id": "job_1", "status": "lost"}]}
+            raise AssertionError(tool)
+
+    old = base._toolbox
+    base.set_toolbox(Tools())
+    try:
+        out = asyncio.run(load_job({"thread_id": "bid:u:job_1", "job_id": "job_1", "steps": 0}))
+    finally:
+        base._toolbox = old
+    assert out["status"] == "skipped" and "prop_9" in out["status_reason"]
+
+
+def test_interview_slots_are_written_for_people():
+    from agent.nodes.client_liaison import human_slot
+    assert human_slot("2026-11-16T09:00:00+05:00") == "Mon 16 Nov, 09:00-09:30 (UTC+5)"
+    assert human_slot("2026-11-16T09:00:00-03:30") == "Mon 16 Nov, 09:00-09:30 (UTC-3:30)"

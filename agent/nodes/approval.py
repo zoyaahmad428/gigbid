@@ -91,7 +91,11 @@ async def submit(state: dict) -> dict:
         if e.kind != "conflict":
             raise
         mine = await tools().call("executor", "list_proposals", {})
-        pid = next(p["proposal_id"] for p in mine["proposals"] if p["job_id"] == j["job_id"])
+        prior = next(p for p in mine["proposals"] if p["job_id"] == j["job_id"])
+        if prior["status"] != "draft":            # applied elsewhere since this thread started
+            return {"status": "needs_attention", "status_reason": f"Not sent: this job already has a proposal "
+                                                                  f"({prior['proposal_id']}, {prior['status']})"}
+        pid = prior["proposal_id"]
     res = await tools().call("executor", "submit_proposal", {"proposal_id": pid, "idempotency_key": _key(tid, "submit"),
                                                              "dry_run": False})
     return {"submission": res, "status": "submitted",
