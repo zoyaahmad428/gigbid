@@ -16,7 +16,7 @@ from agent.nodes.compliance import check
 
 
 class Intent(BaseModel):
-    intent: Literal["question", "negotiation", "interview_request", "scam_signal", "other"]
+    intent: Literal["question", "negotiation", "interview_request", "scam_signal", "acknowledgement", "other"]
     summary: str
     asks: list[str] = Field(default_factory=list, max_length=3)
 
@@ -46,7 +46,12 @@ async def classify(state: dict) -> dict:
     it, u = await to_thread(structured, "liaison_intent", Intent, {
         "status": state["proposal"]["status"], "history": wrap("conversation", _history(msgs[:-1]) or "(none)"),
         "latest": wrap("client_message", msgs[-1]["text"])})
-    return {"intent": it.model_dump(), "usage": usage_entry("liaison_intent", u)}
+    out = {"intent": it.model_dump(), "usage": usage_entry("liaison_intent", u)}
+    if it.intent == "acknowledgement" and not it.asks:
+        # "Thanks" / "Booked, talk then" needs no answer; a drafted reply would only add noise
+        # (found when the worker auto-drafted a reply to "Booked, talk then.").
+        out.update(status="done", status_reason=f"No reply needed: {it.summary}")
+    return out
 
 
 @node("liaison_slots", budget_key="max_tokens_per_conversation_turn")
