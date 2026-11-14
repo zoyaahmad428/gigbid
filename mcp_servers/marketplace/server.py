@@ -121,6 +121,8 @@ class Balance(_Open):
     weekly_allowance: int | None = None
     submissions_today: int | None = None
     max_submissions_per_day: int | None = None
+    submission_fee: int | None = Field(None, description="Connects charged per submitted proposal on top of the "
+                                                          "job's own cost (marketplace policy)")
 
 
 class Proposal(_Open):
@@ -276,8 +278,15 @@ async def get_client_history(client_id: Annotated[str, Field(min_length=1, max_l
 
 @mcp.tool(title="Get Connects balance", annotations=READ)
 async def get_connects_balance() -> Balance:
-    """Current Connects balance, weekly allowance and today's submission count."""
-    return Balance(**await _run("get_connects_balance", {}, lambda a: a.get_connects_balance()))
+    """Current Connects balance, weekly allowance, today's submission count and the per-proposal fee."""
+    async def with_fee(a):
+        bal = await a.get_connects_balance()
+        try:
+            fee = (await a.policy()).get("connects", {}).get("submission_fee")
+        except MarketplaceError:
+            fee = None
+        return {**bal, "submission_fee": fee}
+    return Balance(**await _run("get_connects_balance", {}, with_fee))
 
 
 @mcp.tool(title="Get market price statistics", annotations=READ)

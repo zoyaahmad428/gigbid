@@ -44,8 +44,11 @@ async def pricing(state: dict) -> dict:
     spent = client.get("total_spent_usd") or 0
     if spent > 10_000 and client.get("hire_rate", 0) > 0.5:
         why.append(f"client has spent ${spent:,.0f} and hires often; no discount needed")
-    cost = int(j["connects_cost"])
+    fee = int(bal.get("submission_fee") or 0)            # platform fee per proposal, from the marketplace policy
+    cost = int(j["connects_cost"]) + fee
     balance = int(bal.get("connects_balance", 0))
+    if fee:
+        why.append(f"the job costs {j['connects_cost']} Connects plus the platform's {fee}-Connect submission fee")
     worth = balance - cost >= int(pc["connects_reserve"]) and fit["score"] >= config()["thresholds"]["minimum_fit_score"]
     why.append(f"{cost} Connects of {balance} available; "
                + ("worth it at this fit" if worth else "keep for better-fitting jobs or top up first"))

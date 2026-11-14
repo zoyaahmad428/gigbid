@@ -1,0 +1,27 @@
+# GigSim policy after the 2 Nov 2026 "platform policy update" (the change request), as GigBid
+# was tested against it: every submitted proposal costs a flat 4 Connects on top of the job's cost.
+# Run GigSim with it: GIGSIM_POLICY=data/policy_pack/gigsim_policy_2026-11-02.yaml make gigsim
+version: "2026-11-02"
+
+connects:
+  weekly_allowance: 80            # balance resets at the start of each simulated week (Monday 00:00 UTC)
+  rollover: false
+  # job connects_cost comes from the job record; these apply on top of it
+  submission_fee: 4               # 2026-11-02 update: flat fee per submitted proposal
+  boost_available: false
+
+proposals:
+  cover_letter_min_chars: 100
+  cover_letter_max_chars: 5000
+  max_screening_answer_chars: 2000
+  max_submissions_per_day: 30     # per account, simulated day
+  allow_withdraw: true
+
+content_rules:
+  # "flag": accept, record a policy strike on the account and the client declines.
+  #         Lets evaluations count compliance misses instead of hiding them.
+  # "reject": refuse the submission with HTTP 422.
+  on_violation: flag
+  forbid_contact_details: true    # emails, phone numbers, messaging handles
+  forbid_off_platform_payment: true
+  forbid_guarantees: true         # "guaranteed results", "100% guarantee"
