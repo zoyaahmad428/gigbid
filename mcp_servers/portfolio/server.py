@@ -18,7 +18,8 @@ from mcp.server.mcpserver.exceptions import ToolError
 
 from mcp_servers.common import BearerAuth, current_user, local_user, parse_users
 from mcp_servers.portfolio import prompts, resources
-from mcp_servers.portfolio.tools import K, CaseStudy, Filters, Requirement, SearchResult, SkillList, store_for
+from mcp_servers.portfolio.tools import (K, CaseStudy, EvidenceDoc, Filters, Requirement, SearchResult, SkillList,
+                                         store_for)
 
 READ = t.ToolAnnotations(read_only_hint=True, destructive_hint=False, idempotent_hint=True, open_world_hint=False)
 LOCAL = local_user("PORTFOLIO")
@@ -58,6 +59,18 @@ def get_case_study(id: str) -> CaseStudy:
     if cs is None:
         raise ToolError(f"No case study with id {id!r}. Use search_evidence to find ids.")
     return cs
+
+
+@mcp.tool(title="Get an evidence document", annotations=READ)
+def get_evidence(id: str) -> EvidenceDoc:
+    """Full text and metadata of any portfolio document (case study, README, code, review, CV, past proposal)
+    by its evidence id. Use it to quote or verify exact details before claiming them."""
+    d = _store().by_id.get(id)
+    if d is None:
+        raise ToolError(f"No document with id {id!r}. Use search_evidence to find ids.")
+    return EvidenceDoc(evidence_id=d.evidence_id, type=d.type, title=d.title, source=d.path, date=d.date,
+                       project_id=d.project_id, client_industry=d.client_industry, outcome=d.outcome,
+                       skills=d.skills, skills_implied=d.skills_implied, text=d.text)
 
 
 @mcp.tool(title="List my skills", annotations=READ)

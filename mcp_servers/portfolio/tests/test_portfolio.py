@@ -21,7 +21,9 @@ async def test_search_returns_typed_evidence():
 async def test_implied_skill_found_in_code_only():
     async with Client(mcp) as c:
         r = await c.call_tool("search_evidence", {"requirement": "Celery task queue", "k": 3})
-    assert r.structured_content["hits"][0]["type"] == "code"
+    # Celery appears only in a code file. The deployed retriever groups a project's documents
+    # (case study first, then code), so the code file must be in the top 3, not necessarily first.
+    assert "code" in [h["type"] for h in r.structured_content["hits"]]
 
 
 async def test_filters_outcome_and_type():

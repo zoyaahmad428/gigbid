@@ -159,6 +159,133 @@
         "type": "object"
       }
     },
+    "get_evidence": {
+      "annotations": {
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false,
+        "readOnlyHint": true
+      },
+      "input_schema": {
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id"
+        ],
+        "title": "get_evidenceArguments",
+        "type": "object"
+      },
+      "output_schema": {
+        "properties": {
+          "client_industry": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Client Industry"
+          },
+          "date": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Date"
+          },
+          "evidence_id": {
+            "title": "Evidence Id",
+            "type": "string"
+          },
+          "outcome": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Outcome"
+          },
+          "project_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Project Id"
+          },
+          "skills": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Skills",
+            "type": "array"
+          },
+          "skills_implied": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Skills Implied",
+            "type": "array"
+          },
+          "source": {
+            "title": "Source",
+            "type": "string"
+          },
+          "text": {
+            "description": "Full text of the document",
+            "title": "Text",
+            "type": "string"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "type": {
+            "enum": [
+              "cv",
+              "case_study",
+              "readme",
+              "code",
+              "review",
+              "proposal"
+            ],
+            "title": "Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "evidence_id",
+          "type",
+          "title",
+          "source",
+          "date",
+          "project_id",
+          "client_industry",
+          "outcome",
+          "skills",
+          "skills_implied",
+          "text"
+        ],
+        "title": "EvidenceDoc",
+        "type": "object"
+      }
+    },
     "list_skills": {
       "annotations": {
         "destructiveHint": false,

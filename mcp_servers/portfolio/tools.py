@@ -70,6 +70,20 @@ class CaseStudy(BaseModel):
     related: list[RelatedDoc] = Field(description="Other documents about the same project")
 
 
+class EvidenceDoc(BaseModel):
+    evidence_id: str
+    type: EvidenceType
+    title: str
+    source: str
+    date: str | None
+    project_id: str | None
+    client_industry: str | None
+    outcome: str | None
+    skills: list[str]
+    skills_implied: list[str]
+    text: str = Field(description="Full text of the document")
+
+
 class SkillEntry(BaseModel):
     skill: str
     evidence_count: int
@@ -89,7 +103,7 @@ class Store:
         self.persona = persona
         self.docs: list[Doc] = load_persona(persona)
         self.by_id = {d.evidence_id: d for d in self.docs}
-        self.name = os.environ.get("PORTFOLIO_RETRIEVER", "bm25")
+        self.name = os.environ.get("PORTFOLIO_RETRIEVER") or _deployed_variant()
         self.retriever = retriever_factory.build(self.docs, self.name)
 
     def _allowed(self, f: Filters | None) -> list[int]:
@@ -119,7 +133,9 @@ class Store:
     def snippet(text: str, query: str, width: int = 320) -> str:
         q = set(tokenize(query))
         paras = [p.strip() for p in re.split(r"\n\s*\n", text) if p.strip() and not p.startswith("#")] or [text]
-        best = max(paras, key=lambda p: len(q & set(tokenize(p))))
+        # Most words in common with the requirement; on ties prefer prose over code blocks and
+        # tables (a case study's first paragraph is often a code fence, which grades badly).
+        best = max(paras, key=lambda p: (len(q & set(tokenize(p))), not p.lstrip().startswith(("```", "|"))))
         return best if len(best) <= width else best[:width].rsplit(" ", 1)[0] + "..."
 
     def search(self, requirement: str, k: int, filters: Filters | None) -> SearchResult:
@@ -162,6 +178,13 @@ class Store:
                               implied_in=a["implied"], last_used=a["last"]) for s, a in agg.items()]
         entries.sort(key=lambda e: (-e.projects, -e.evidence_count, e.skill))
         return SkillList(persona=self.persona, skills=entries)
+
+
+def _deployed_variant() -> str:
+    """rag.variant from agent/config.yaml: the variant the evaluation chose."""
+    import yaml
+    from rag.ingest.corpus import ROOT
+    return (yaml.safe_load((ROOT / "agent/config.yaml").read_text()).get("rag") or {}).get("variant", "bm25")
 
 
 @lru_cache(maxsize=8)
