@@ -32,6 +32,7 @@ CREATE INDEX IF NOT EXISTS runs_user ON runs (user_id, updated_at);
 CREATE TABLE IF NOT EXISTS run_events (seq INTEGER PRIMARY KEY AUTOINCREMENT, thread_id TEXT NOT NULL,
     ts REAL NOT NULL, data TEXT NOT NULL);
 CREATE INDEX IF NOT EXISTS run_events_thread ON run_events (thread_id, seq);
+CREATE TABLE IF NOT EXISTS kv (key TEXT PRIMARY KEY, value TEXT NOT NULL);
 """
 SESSION_DAYS = 14
 
@@ -123,9 +124,11 @@ class AppStore:
             if cur:
                 sets, args = ["status=?", "reason=?", "updated_at=?"], [status, reason, now]
                 if title:
-                    sets.append("title=?"); args.append(title)
+                    sets.append("title=?")
+                    args.append(title)
                 if summary is not None:
-                    sets.append("summary=?"); args.append(json.dumps(summary))
+                    sets.append("summary=?")
+                    args.append(json.dumps(summary))
                 self.db.execute(f"UPDATE runs SET {', '.join(sets)} WHERE thread_id=?", (*args, thread_id))
             else:
                 self.db.execute("INSERT INTO runs VALUES (?,?,?,?,?,?,?,?,?,?,?)",
@@ -139,9 +142,11 @@ class AppStore:
     def runs(self, user_id: str, *, kind: str | None = None, status: str | None = None, limit: int = 200) -> list[dict]:
         sql, args = "SELECT * FROM runs WHERE user_id=?", [user_id]
         if kind:
-            sql += " AND kind=?"; args.append(kind)
+            sql += " AND kind=?"
+            args.append(kind)
         if status:
-            sql += " AND status=?"; args.append(status)
+            sql += " AND status=?"
+            args.append(status)
         return [_run_row(r) for r in self._q(sql + " ORDER BY updated_at DESC LIMIT ?", (*args, limit))]
 
     def runs_by_job(self, user_id: str, job_ids: list[str]) -> dict[str, dict]:
@@ -151,6 +156,21 @@ class AppStore:
         rows = self._q(f"SELECT * FROM runs WHERE user_id=? AND kind='bid' AND job_id IN ({marks})",
                        (user_id, *job_ids))
         return {r["job_id"]: _run_row(r) for r in rows}
+
+    def runs_started_since(self, user_id: str, since: float) -> int:
+        return self._q("SELECT COUNT(*) FROM runs WHERE user_id=? AND created_at>=?", (user_id, since))[0][0]
+
+    def onboarded_users(self) -> list[dict]:
+        return [self.user(r["user_id"]) for r in self._q("SELECT user_id FROM users WHERE onboarded=1")]
+
+    # ---- small worker state (event cursors)
+    def get_kv(self, key: str, default: Any = None) -> Any:
+        rows = self._q("SELECT value FROM kv WHERE key=?", (key,))
+        return json.loads(rows[0]["value"]) if rows else default
+
+    def set_kv(self, key: str, value: Any) -> None:
+        self._q("INSERT INTO kv VALUES (?,?) ON CONFLICT(key) DO UPDATE SET value=excluded.value",
+                (key, json.dumps(value)))
 
     def mark_orphans(self) -> int:
         """Runs left 'running' by a process that died. Their checkpoints survive; the UI offers retry."""

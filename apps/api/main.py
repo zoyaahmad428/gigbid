@@ -15,10 +15,10 @@ from __future__ import annotations
 import asyncio
 import json
 import logging
+import os
 import time
 from collections import Counter
 from contextlib import asynccontextmanager
-from pathlib import Path
 
 from fastapi import Depends, FastAPI, Header, HTTPException, Query, Request
 from fastapi.encoders import jsonable_encoder
@@ -33,7 +33,7 @@ from agent.memory import store as memory
 from agent.runtime import Runtime, bid_thread, convo_thread
 from agent.settings import ROOT, config
 from agent.trace import TRACES
-from apps.api.runs import FINAL, RunManager
+from apps.api.runs import FINAL, RunManager, agent_user, make_queue
 from apps.api.schemas import Credentials, Decision, Session, Settings, StartRun
 from apps.api.store import AppStore
 
@@ -44,22 +44,50 @@ DEFAULT_TOKENS = {"ai_ml": "dev-token-ai-ml", "fullstack": "dev-token-fullstack"
 WEB_DIST = ROOT / "apps/web/dist"
 
 
+ALLOW_SIGNUP = os.environ.get("GIGBID_ALLOW_SIGNUP", "true").lower() != "false"
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     app.state.store = AppStore()
-    n = app.state.store.mark_orphans()
-    if n:
-        log.warning("%d run(s) were interrupted by the last shutdown; they can be retried", n)
+    queue = await make_queue()
+    if queue is None:
+        # In-process runs died with the last process. (With the worker, runs outlive an API restart.)
+        n = app.state.store.mark_orphans()
+        if n:
+            log.warning("%d run(s) were interrupted by the last shutdown; they can be retried", n)
+    seed_accounts(app.state.store)
     async with Runtime() as rt:
         app.state.rt = rt
-        app.state.runs = RunManager(rt, app.state.store)
+        app.state.runs = RunManager(rt, app.state.store, queue=queue)
         app.state.adapters = {}
         yield
         for a in app.state.adapters.values():
             await a.aclose()
+        if queue is not None:
+            await queue.aclose()
 
 
-app = FastAPI(title="GigBid API", version="0.5.0", lifespan=lifespan)
+def seed_accounts(st: AppStore) -> None:
+    """Reviewer accounts for a deployment: GIGBID_SEED_USERS="email:password:persona,...".
+    Created once, already onboarded on the persona's GigSim account. Passwords come from the
+    deployment's secrets, never from the repository."""
+    for item in filter(None, os.environ.get("GIGBID_SEED_USERS", "").split(",")):
+        email, password, persona = (item.strip().split(":") + ["ai_ml"])[:3]
+        try:
+            u = st.create_user(email, password)
+        except ValueError:
+            continue                                         # already there
+        prof = json.loads((ROOT / f"data/personas/{persona}/profile.json").read_text())
+        st.save_settings(u["user_id"], {
+            "persona": persona, "name": prof["name"], "headline": prof["headline"],
+            "hourly_rate": prof.get("hourly_rate_usd", 40), "min_fixed_budget": 100,
+            "marketplace_token": DEFAULT_TOKENS[persona], "autonomy_auto_skip": True, "auto_scout": False,
+            "timezone": "Asia/Karachi", "weekly_connects_budget": 60}, onboarded=True)
+        log.info("seeded reviewer account %s (%s)", email, persona)
+
+
+app = FastAPI(title="GigBid API", version="0.6.0", lifespan=lifespan)
 app.add_middleware(CORSMiddleware, allow_origins=["http://localhost:5173", "http://127.0.0.1:5173"],
                    allow_methods=["*"], allow_headers=["*"])
 
@@ -87,15 +115,6 @@ def onboarded(user: dict = Depends(current_user)) -> dict:
     return user
 
 
-def agent_user(user: dict) -> dict:
-    """The UserContext the graphs receive (agent/state.py)."""
-    s = user["settings"]
-    return {"user_id": user["user_id"], "persona": s["persona"], "marketplace_token": s["marketplace_token"],
-            "name": s["name"], "headline": s.get("headline", ""), "hourly_rate": s["hourly_rate"],
-            "min_fixed_budget": s["min_fixed_budget"], "autonomy_auto_skip": s.get("autonomy_auto_skip", True),
-            "timezone": s.get("timezone", "Asia/Karachi")}
-
-
 async def market(request: Request, user: dict, method: str, *args, retries: int = 3):
     """Call the user's marketplace adapter, retrying rate limits and transient 5xx (GigSim has chaos on)."""
     tok = user["settings"]["marketplace_token"]
@@ -113,6 +132,13 @@ async def market(request: Request, user: dict, method: str, *args, retries: int 
             await asyncio.sleep(0.5 * (i + 1))
 
 
+def within_quota(user: dict, st: AppStore) -> None:
+    """Cost guard for a shared deployment: new runs per user per day (budgets.max_runs_per_user_per_day)."""
+    cap = int(config()["budgets"].get("max_runs_per_user_per_day", 0))
+    if cap and st.runs_started_since(user["user_id"], time.time() - 86400) >= cap:
+        raise HTTPException(429, f"daily limit of {cap} new runs reached; it resets 24 hours after your first run")
+
+
 def own_run(thread_id: str, user: dict, st: AppStore) -> dict:
     r = st.run(thread_id)
     if not r or r["user_id"] != user["user_id"]:
@@ -128,6 +154,8 @@ async def health():
 
 @app.post("/api/auth/register", response_model=Session, status_code=201)
 async def register(body: Credentials, st: AppStore = Depends(store)):
+    if not ALLOW_SIGNUP:
+        raise HTTPException(403, "sign-up is closed on this deployment; use the reviewer account you were given")
     try:
         u = st.create_user(body.email, body.password)
     except ValueError as e:
@@ -211,11 +239,12 @@ async def start_bid(job_id: str, body: StartRun, request: Request, user: dict = 
     existing = st.run(tid)
     if existing and not body.force_bid and existing["status"] not in ("failed",):
         raise HTTPException(409, f"this job already has a run ({existing['status']}); open it instead")
+    within_quota(user, st)
     j = await market(request, user, "get_job", job_id)
     au = agent_user(user)
     try:
-        rm.launch(tid, au, "bid", rm.rt.start_bid(au, job_id, force_bid=body.force_bid), job_id=job_id,
-                  title=j.get("title"))
+        await rm.launch(tid, au, "bid", "start_bid", {"job_id": job_id, "force_bid": body.force_bid},
+                        job_id=job_id, title=j.get("title"))
     except RuntimeError as e:
         raise HTTPException(409, str(e)) from None
     return {"thread_id": tid, "status": "running"}
@@ -300,7 +329,8 @@ async def decide(thread_id: str, body: Decision, user: dict = Depends(onboarded)
         raise HTTPException(409, "nothing is waiting for approval on this run")
     au = agent_user(user)
     try:
-        rm.launch(thread_id, au, r["kind"], rm.rt.resume(thread_id, au, dec.model_dump(exclude_none=True)))
+        await rm.launch(thread_id, au, r["kind"], "resume", {"decision": dec.model_dump(exclude_none=True),
+                                                             "base": s["checkpoint_id"]})
     except RuntimeError as e:
         raise HTTPException(409, str(e)) from None
     return {"thread_id": thread_id, "status": "running"}
@@ -312,20 +342,13 @@ async def retry(thread_id: str, user: dict = Depends(onboarded), st: AppStore = 
     r = own_run(thread_id, user, st)
     if r["status"] not in ("degraded", "dead_letter", "failed", "interrupted", "needs_attention"):
         raise HTTPException(409, f"a {r['status']} run cannot be retried")
-    au = agent_user(user)
-    gen = rm.rt.retry(thread_id, au)
+    phase, _ = await rm.rt.phase(thread_id)
+    if phase != "pending_work" and await rm.rt.retry_point(thread_id) is None:   # a 409 now, not a failed run later
+        raise HTTPException(409, f"{thread_id}: no checkpoint with pending work to retry from")
     try:
-        first = await gen.__anext__()               # surfaces "nothing to retry" as a 409, not a failed run
-    except LookupError as e:
+        await rm.launch(thread_id, agent_user(user), r["kind"], "retry")
+    except RuntimeError as e:
         raise HTTPException(409, str(e)) from None
-    except StopAsyncIteration:
-        raise HTTPException(409, "nothing to retry") from None
-
-    async def chain():
-        yield first
-        async for ev in gen:
-            yield ev
-    rm.launch(thread_id, au, r["kind"], chain())
     return {"thread_id": thread_id, "status": "running"}
 
 
@@ -361,12 +384,14 @@ async def draft_reply(proposal_id: str, request: Request, user: dict = Depends(o
     tid = convo_thread(user["user_id"], proposal_id, len(msgs))
     if st.run(tid) and st.run(tid)["status"] != "failed":
         return {"thread_id": tid, "status": st.run(tid)["status"]}
+    within_quota(user, st)
     p = await market(request, user, "get_proposal", proposal_id)
     bid = st.run(bid_thread(user["user_id"], p["job_id"]))
     au = agent_user(user)
     try:
-        rm.launch(tid, au, "convo", rm.rt.start_conversation(au, proposal_id, len(msgs)), job_id=p.get("job_id"),
-                  proposal_id=proposal_id, title=(bid or {}).get("title") or p["job_id"])
+        await rm.launch(tid, au, "convo", "start_conversation", {"proposal_id": proposal_id, "n_messages": len(msgs)},
+                        job_id=p.get("job_id"), proposal_id=proposal_id,
+                        title=(bid or {}).get("title") or p["job_id"])
     except RuntimeError as e:
         raise HTTPException(409, str(e)) from None
     return {"thread_id": tid, "status": "running"}

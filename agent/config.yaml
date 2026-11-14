@@ -78,6 +78,16 @@ budgets:
   max_revisions: 2                # Critic can send a draft back at most this many times
   max_tokens_per_job: 40000
   max_tokens_per_conversation_turn: 15000
+  max_runs_per_user_per_day: 25   # new bid/reply runs per user per day (API and scout); 0 = no limit
+
+worker:                           # worker/ (Arq on Redis); schedules use the real clock
+  scout_every_minutes: 30         # look for new jobs for users who turned on auto-scout
+  scout_jobs_scanned: 20          # newest jobs in the user's category checked per tick
+  scout_max_new_runs: 2           # bid runs started per user per tick (each stops at approval)
+  monitor_every_minutes: 5        # read marketplace events: client messages, outcomes
+  auto_draft_replies: true        # a client message starts a reply draft (it waits for approval)
+  job_timeout_seconds: 600       # a killed worker's job runs again after this (docker stop: at once)
+  max_tries: 3
 
 thresholds:
   # Fit thresholds are calibrated, not hand-set: evals/runners/fit_calibration.py (tune half of the

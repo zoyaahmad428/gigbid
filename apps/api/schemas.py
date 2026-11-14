@@ -27,6 +27,7 @@ class Settings(BaseModel):
     min_fixed_budget: float = Field(ge=0, le=100000)
     marketplace_token: str = Field(min_length=1, max_length=200)
     autonomy_auto_skip: bool = True
+    auto_scout: bool = False          # the worker looks for new jobs on a schedule and drafts (never sends)
     timezone: str = "Asia/Karachi"
     weekly_connects_budget: int = Field(100, ge=0, le=1000)
 
