@@ -1,0 +1,199 @@
+{
+  "meta": {
+    "embeddings": "nomic-ai/nomic-embed-text-v1.5-Q",
+    "reranker": "jinaai/jina-reranker-v1-turbo-en",
+    "limit": null,
+    "pool": "portfolio",
+    "generated_at": "2026-11-14T04:44:22Z"
+  },
+  "summaries": [
+    {
+      "recall@5": 0.248,
+      "mrr": 0.3637,
+      "ndcg@10": 0.3976,
+      "proj_recall@3": 0.3057,
+      "latency_p50_s": 0.1215,
+      "latency_p95_s": 0.2962,
+      "variant": "v0_naive",
+      "persona": "ai_ml",
+      "n_bid_jobs": 100,
+      "index_build_s": 37.56,
+      "config": {
+        "name": "v0_naive",
+        "query": "post",
+        "retrieval": "dense",
+        "rerank": false,
+        "outcome": false,
+        "multivector": false,
+        "corrective": false
+      }
+    },
+    {
+      "recall@5": 0.287,
+      "mrr": 0.3781,
+      "ndcg@10": 0.3775,
+      "proj_recall@3": 0.3493,
+      "latency_p50_s": 0.1323,
+      "latency_p95_s": 0.333,
+      "variant": "v0_naive",
+      "persona": "fullstack",
+      "n_bid_jobs": 100,
+      "index_build_s": 35.15,
+      "config": {
+        "name": "v0_naive",
+        "query": "post",
+        "retrieval": "dense",
+        "rerank": false,
+        "outcome": false,
+        "multivector": false,
+        "corrective": false
+      }
+    },
+    {
+      "recall@5": 0.3529,
+      "mrr": 0.4943,
+      "ndcg@10": 0.4721,
+      "proj_recall@3": 0.3572,
+      "latency_p50_s": 0.1274,
+      "latency_p95_s": 0.3213,
+      "variant": "v0_naive",
+      "persona": "data_analyst",
+      "n_bid_jobs": 85,
+      "index_build_s": 35.59,
+      "config": {
+        "name": "v0_naive",
+        "query": "post",
+        "retrieval": "dense",
+        "rerank": false,
+        "outcome": false,
+        "multivector": false,
+        "corrective": false
+      }
+    },
+    {
+      "variant": "v0_naive",
+      "persona": "ALL",
+      "recall@5": 0.293,
+      "mrr": 0.4077,
+      "ndcg@10": 0.4128,
+      "proj_recall@3": 0.3364,
+      "latency_p50_s": 0.1274,
+      "latency_p95_s": 0.3213,
+      "n_bid_jobs": 285,
+      "by_job_type": {
+        "1-3 requirements": {
+          "recall@5": 0.2993,
+          "mrr": 0.4361,
+          "ndcg@10": 0.4105,
+          "proj_recall@3": 0.3249,
+          "latency_p50_s": 0.0716,
+          "latency_p95_s": 0.2651,
+          "n": 136
+        },
+        "4+ requirements": {
+          "recall@5": 0.2872,
+          "mrr": 0.3818,
+          "ndcg@10": 0.4149,
+          "proj_recall@3": 0.3468,
+          "latency_p50_s": 0.1808,
+          "latency_p95_s": 0.3346,
+          "n": 149
+        }
+      }
+    },
+    {
+      "recall@5": 0.34,
+      "mrr": 0.4139,
+      "ndcg@10": 0.4726,
+      "proj_recall@3": 0.4023,
+      "latency_p50_s": 0.1192,
+      "latency_p95_s": 0.2731,
+      "variant": "v2_hybrid",
+      "persona": "ai_ml",
+      "n_bid_jobs": 100,
+      "index_build_s": 0.02,
+      "config": {
+        "name": "v2_hybrid",
+        "query": "post",
+        "retrieval": "hybrid",
+        "rerank": false,
+        "outcome": false,
+        "multivector": false,
+        "corrective": false
+      }
+    },
+    {
+      "recall@5": 0.2995,
+      "mrr": 0.4311,
+      "ndcg@10": 0.4072,
+      "proj_recall@3": 0.3752,
+      "latency_p50_s": 0.1172,
+      "latency_p95_s": 0.3157,
+      "variant": "v2_hybrid",
+      "persona": "fullstack",
+      "n_bid_jobs": 100,
+      "index_build_s": 0.02,
+      "config": {
+        "name": "v2_hybrid",
+        "query": "post",
+        "retrieval": "hybrid",
+        "rerank": false,
+        "outcome": false,
+        "multivector": false,
+        "corrective": false
+      }
+    },
+    {
+      "recall@5": 0.4024,
+      "mrr": 0.4849,
+      "ndcg@10": 0.5243,
+      "proj_recall@3": 0.4045,
+      "latency_p50_s": 0.1319,
+      "latency_p95_s": 0.3093,
+      "variant": "v2_hybrid",
+      "persona": "data_analyst",
+      "n_bid_jobs": 85,
+      "index_build_s": 0.02,
+      "config": {
+        "name": "v2_hybrid",
+        "query": "post",
+        "retrieval": "hybrid",
+        "rerank": false,
+        "outcome": false,
+        "multivector": false,
+        "corrective": false
+      }
+    },
+    {
+      "variant": "v2_hybrid",
+      "persona": "ALL",
+      "recall@5": 0.3444,
+      "mrr": 0.4411,
+      "ndcg@10": 0.4651,
+      "proj_recall@3": 0.3934,
+      "latency_p50_s": 0.1205,
+      "latency_p95_s": 0.3056,
+      "n_bid_jobs": 285,
+      "by_job_type": {
+        "1-3 requirements": {
+          "recall@5": 0.3368,
+          "mrr": 0.4582,
+          "ndcg@10": 0.4683,
+          "proj_recall@3": 0.3746,
+          "latency_p50_s": 0.0774,
+          "latency_p95_s": 0.2484,
+          "n": 136
+        },
+        "4+ requirements": {
+          "recall@5": 0.3513,
+          "mrr": 0.4256,
+          "ndcg@10": 0.4621,
+          "proj_recall@3": 0.4106,
+          "latency_p50_s": 0.1859,
+          "latency_p95_s": 0.3238,
+          "n": 149
+        }
+      }
+    }
+  ]
+}

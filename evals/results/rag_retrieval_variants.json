@@ -1,0 +1,675 @@
+{
+  "meta": {
+    "embeddings": "BAAI/bge-small-en-v1.5",
+    "reranker": "jinaai/jina-reranker-v1-turbo-en",
+    "limit": null,
+    "pool": "portfolio",
+    "generated_at": "2026-11-14T03:57:58Z"
+  },
+  "summaries": [
+    {
+      "recall@5": 0.324,
+      "mrr": 0.3908,
+      "ndcg@10": 0.4291,
+      "proj_recall@3": 0.3529,
+      "latency_p50_s": 0.0475,
+      "latency_p95_s": 0.1302,
+      "variant": "v0_naive",
+      "persona": "ai_ml",
+      "n_bid_jobs": 100,
+      "index_build_s": 0.0,
+      "config": {
+        "name": "v0_naive",
+        "query": "post",
+        "retrieval": "dense",
+        "rerank": false,
+        "outcome": false,
+        "multivector": false,
+        "corrective": false
+      }
+    },
+    {
+      "recall@5": 0.3685,
+      "mrr": 0.5119,
+      "ndcg@10": 0.4506,
+      "proj_recall@3": 0.436,
+      "latency_p50_s": 0.0534,
+      "latency_p95_s": 0.1477,
+      "variant": "v0_naive",
+      "persona": "fullstack",
+      "n_bid_jobs": 100,
+      "index_build_s": 0.01,
+      "config": {
+        "name": "v0_naive",
+        "query": "post",
+        "retrieval": "dense",
+        "rerank": false,
+        "outcome": false,
+        "multivector": false,
+        "corrective": false
+      }
+    },
+    {
+      "recall@5": 0.4118,
+      "mrr": 0.5022,
+      "ndcg@10": 0.5162,
+      "proj_recall@3": 0.3843,
+      "latency_p50_s": 0.0707,
+      "latency_p95_s": 0.1939,
+      "variant": "v0_naive",
+      "persona": "data_analyst",
+      "n_bid_jobs": 85,
+      "index_build_s": 0.01,
+      "config": {
+        "name": "v0_naive",
+        "query": "post",
+        "retrieval": "dense",
+        "rerank": false,
+        "outcome": false,
+        "multivector": false,
+        "corrective": false
+      }
+    },
+    {
+      "variant": "v0_naive",
+      "persona": "ALL",
+      "recall@5": 0.3658,
+      "mrr": 0.4665,
+      "ndcg@10": 0.4626,
+      "proj_recall@3": 0.3914,
+      "latency_p50_s": 0.0547,
+      "latency_p95_s": 0.1587,
+      "n_bid_jobs": 285,
+      "by_job_type": {
+        "1-3 requirements": {
+          "recall@5": 0.3787,
+          "mrr": 0.4784,
+          "ndcg@10": 0.4646,
+          "proj_recall@3": 0.3788,
+          "latency_p50_s": 0.0284,
+          "latency_p95_s": 0.1302,
+          "n": 136
+        },
+        "4+ requirements": {
+          "recall@5": 0.354,
+          "mrr": 0.4556,
+          "ndcg@10": 0.4607,
+          "proj_recall@3": 0.4029,
+          "latency_p50_s": 0.0791,
+          "latency_p95_s": 0.1611,
+          "n": 149
+        }
+      }
+    },
+    {
+      "recall@5": 0.31,
+      "mrr": 0.4347,
+      "ndcg@10": 0.4243,
+      "proj_recall@3": 0.34,
+      "latency_p50_s": 0.0424,
+      "latency_p95_s": 0.1206,
+      "variant": "v1_decompose",
+      "persona": "ai_ml",
+      "n_bid_jobs": 100,
+      "index_build_s": 0.0,
+      "config": {
+        "name": "v1_decompose",
+        "query": "decompose",
+        "retrieval": "dense",
+        "rerank": false,
+        "outcome": false,
+        "multivector": false,
+        "corrective": false
+      }
+    },
+    {
+      "recall@5": 0.382,
+      "mrr": 0.502,
+      "ndcg@10": 0.4611,
+      "proj_recall@3": 0.4618,
+      "latency_p50_s": 0.0458,
+      "latency_p95_s": 0.151,
+      "variant": "v1_decompose",
+      "persona": "fullstack",
+      "n_bid_jobs": 100,
+      "index_build_s": 0.01,
+      "config": {
+        "name": "v1_decompose",
+        "query": "decompose",
+        "retrieval": "dense",
+        "rerank": false,
+        "outcome": false,
+        "multivector": false,
+        "corrective": false
+      }
+    },
+    {
+      "recall@5": 0.4329,
+      "mrr": 0.5233,
+      "ndcg@10": 0.5175,
+      "proj_recall@3": 0.4271,
+      "latency_p50_s": 0.0457,
+      "latency_p95_s": 0.0992,
+      "variant": "v1_decompose",
+      "persona": "data_analyst",
+      "n_bid_jobs": 85,
+      "index_build_s": 0.0,
+      "config": {
+        "name": "v1_decompose",
+        "query": "decompose",
+        "retrieval": "dense",
+        "rerank": false,
+        "outcome": false,
+        "multivector": false,
+        "corrective": false
+      }
+    },
+    {
+      "variant": "v1_decompose",
+      "persona": "ALL",
+      "recall@5": 0.3719,
+      "mrr": 0.4848,
+      "ndcg@10": 0.465,
+      "proj_recall@3": 0.4087,
+      "latency_p50_s": 0.0443,
+      "latency_p95_s": 0.1206,
+      "n_bid_jobs": 285,
+      "by_job_type": {
+        "1-3 requirements": {
+          "recall@5": 0.3967,
+          "mrr": 0.4998,
+          "ndcg@10": 0.4796,
+          "proj_recall@3": 0.4097,
+          "latency_p50_s": 0.0314,
+          "latency_p95_s": 0.0851,
+          "n": 136
+        },
+        "4+ requirements": {
+          "recall@5": 0.3493,
+          "mrr": 0.471,
+          "ndcg@10": 0.4517,
+          "proj_recall@3": 0.4078,
+          "latency_p50_s": 0.0585,
+          "latency_p95_s": 0.136,
+          "n": 149
+        }
+      }
+    },
+    {
+      "recall@5": 0.4,
+      "mrr": 0.486,
+      "ndcg@10": 0.5006,
+      "proj_recall@3": 0.4364,
+      "latency_p50_s": 0.0644,
+      "latency_p95_s": 0.1686,
+      "variant": "v2_hybrid",
+      "persona": "ai_ml",
+      "n_bid_jobs": 100,
+      "index_build_s": 0.02,
+      "config": {
+        "name": "v2_hybrid",
+        "query": "post",
+        "retrieval": "hybrid",
+        "rerank": false,
+        "outcome": false,
+        "multivector": false,
+        "corrective": false
+      }
+    },
+    {
+      "recall@5": 0.3825,
+      "mrr": 0.5401,
+      "ndcg@10": 0.4707,
+      "proj_recall@3": 0.4557,
+      "latency_p50_s": 0.1009,
+      "latency_p95_s": 0.2792,
+      "variant": "v2_hybrid",
+      "persona": "fullstack",
+      "n_bid_jobs": 100,
+      "index_build_s": 0.02,
+      "config": {
+        "name": "v2_hybrid",
+        "query": "post",
+        "retrieval": "hybrid",
+        "rerank": false,
+        "outcome": false,
+        "multivector": false,
+        "corrective": false
+      }
+    },
+    {
+      "recall@5": 0.4376,
+      "mrr": 0.5127,
+      "ndcg@10": 0.5513,
+      "proj_recall@3": 0.4054,
+      "latency_p50_s": 0.1847,
+      "latency_p95_s": 0.4182,
+      "variant": "v2_hybrid",
+      "persona": "data_analyst",
+      "n_bid_jobs": 85,
+      "index_build_s": 0.02,
+      "config": {
+        "name": "v2_hybrid",
+        "query": "post",
+        "retrieval": "hybrid",
+        "rerank": false,
+        "outcome": false,
+        "multivector": false,
+        "corrective": false
+      }
+    },
+    {
+      "variant": "v2_hybrid",
+      "persona": "ALL",
+      "recall@5": 0.4051,
+      "mrr": 0.5129,
+      "ndcg@10": 0.5052,
+      "proj_recall@3": 0.4339,
+      "latency_p50_s": 0.0911,
+      "latency_p95_s": 0.333,
+      "n_bid_jobs": 285,
+      "by_job_type": {
+        "1-3 requirements": {
+          "recall@5": 0.4129,
+          "mrr": 0.5332,
+          "ndcg@10": 0.5138,
+          "proj_recall@3": 0.437,
+          "latency_p50_s": 0.055,
+          "latency_p95_s": 0.2504,
+          "n": 136
+        },
+        "4+ requirements": {
+          "recall@5": 0.398,
+          "mrr": 0.4945,
+          "ndcg@10": 0.4974,
+          "proj_recall@3": 0.4311,
+          "latency_p50_s": 0.1286,
+          "latency_p95_s": 0.3795,
+          "n": 149
+        }
+      }
+    },
+    {
+      "recall@5": 0.326,
+      "mrr": 0.3708,
+      "ndcg@10": 0.428,
+      "proj_recall@3": 0.3649,
+      "latency_p50_s": 0.1433,
+      "latency_p95_s": 1.7143,
+      "variant": "v3_rerank",
+      "persona": "ai_ml",
+      "n_bid_jobs": 100,
+      "index_build_s": 0.0,
+      "config": {
+        "name": "v3_rerank",
+        "query": "post",
+        "retrieval": "dense",
+        "rerank": true,
+        "outcome": false,
+        "multivector": false,
+        "corrective": false
+      }
+    },
+    {
+      "recall@5": 0.3775,
+      "mrr": 0.5448,
+      "ndcg@10": 0.463,
+      "proj_recall@3": 0.5082,
+      "latency_p50_s": 1.6836,
+      "latency_p95_s": 2.5878,
+      "variant": "v3_rerank",
+      "persona": "fullstack",
+      "n_bid_jobs": 100,
+      "index_build_s": 0.0,
+      "config": {
+        "name": "v3_rerank",
+        "query": "post",
+        "retrieval": "dense",
+        "rerank": true,
+        "outcome": false,
+        "multivector": false,
+        "corrective": false
+      }
+    },
+    {
+      "recall@5": 0.4612,
+      "mrr": 0.609,
+      "ndcg@10": 0.5612,
+      "proj_recall@3": 0.4496,
+      "latency_p50_s": 1.8382,
+      "latency_p95_s": 3.1298,
+      "variant": "v3_rerank",
+      "persona": "data_analyst",
+      "n_bid_jobs": 85,
+      "index_build_s": 0.0,
+      "config": {
+        "name": "v3_rerank",
+        "query": "post",
+        "retrieval": "dense",
+        "rerank": true,
+        "outcome": false,
+        "multivector": false,
+        "corrective": false
+      }
+    },
+    {
+      "variant": "v3_rerank",
+      "persona": "ALL",
+      "recall@5": 0.3844,
+      "mrr": 0.5029,
+      "ndcg@10": 0.48,
+      "proj_recall@3": 0.4405,
+      "latency_p50_s": 1.4549,
+      "latency_p95_s": 2.5401,
+      "n_bid_jobs": 285,
+      "by_job_type": {
+        "1-3 requirements": {
+          "recall@5": 0.3871,
+          "mrr": 0.5005,
+          "ndcg@10": 0.4849,
+          "proj_recall@3": 0.4365,
+          "latency_p50_s": 1.3583,
+          "latency_p95_s": 2.3601,
+          "n": 136
+        },
+        "4+ requirements": {
+          "recall@5": 0.3819,
+          "mrr": 0.5051,
+          "ndcg@10": 0.4755,
+          "proj_recall@3": 0.4441,
+          "latency_p50_s": 1.5818,
+          "latency_p95_s": 2.7474,
+          "n": 149
+        }
+      }
+    },
+    {
+      "recall@5": 0.376,
+      "mrr": 0.5086,
+      "ndcg@10": 0.4609,
+      "proj_recall@3": 0.3784,
+      "latency_p50_s": 0.0534,
+      "latency_p95_s": 0.1272,
+      "variant": "v4_outcome",
+      "persona": "ai_ml",
+      "n_bid_jobs": 100,
+      "index_build_s": 0.0,
+      "config": {
+        "name": "v4_outcome",
+        "query": "post",
+        "retrieval": "dense",
+        "rerank": false,
+        "outcome": true,
+        "multivector": false,
+        "corrective": false
+      }
+    },
+    {
+      "recall@5": 0.374,
+      "mrr": 0.5079,
+      "ndcg@10": 0.4416,
+      "proj_recall@3": 0.4057,
+      "latency_p50_s": 0.0518,
+      "latency_p95_s": 0.1437,
+      "variant": "v4_outcome",
+      "persona": "fullstack",
+      "n_bid_jobs": 100,
+      "index_build_s": 0.0,
+      "config": {
+        "name": "v4_outcome",
+        "query": "post",
+        "retrieval": "dense",
+        "rerank": false,
+        "outcome": true,
+        "multivector": false,
+        "corrective": false
+      }
+    },
+    {
+      "recall@5": 0.3953,
+      "mrr": 0.5039,
+      "ndcg@10": 0.4841,
+      "proj_recall@3": 0.319,
+      "latency_p50_s": 0.0576,
+      "latency_p95_s": 0.1539,
+      "variant": "v4_outcome",
+      "persona": "data_analyst",
+      "n_bid_jobs": 85,
+      "index_build_s": 0.0,
+      "config": {
+        "name": "v4_outcome",
+        "query": "post",
+        "retrieval": "dense",
+        "rerank": false,
+        "outcome": true,
+        "multivector": false,
+        "corrective": false
+      }
+    },
+    {
+      "variant": "v4_outcome",
+      "persona": "ALL",
+      "recall@5": 0.3811,
+      "mrr": 0.507,
+      "ndcg@10": 0.4611,
+      "proj_recall@3": 0.3703,
+      "latency_p50_s": 0.0545,
+      "latency_p95_s": 0.1409,
+      "n_bid_jobs": 285,
+      "by_job_type": {
+        "1-3 requirements": {
+          "recall@5": 0.3857,
+          "mrr": 0.5174,
+          "ndcg@10": 0.4608,
+          "proj_recall@3": 0.3671,
+          "latency_p50_s": 0.029,
+          "latency_p95_s": 0.1096,
+          "n": 136
+        },
+        "4+ requirements": {
+          "recall@5": 0.3768,
+          "mrr": 0.4975,
+          "ndcg@10": 0.4613,
+          "proj_recall@3": 0.3731,
+          "latency_p50_s": 0.0825,
+          "latency_p95_s": 0.1539,
+          "n": 149
+        }
+      }
+    },
+    {
+      "recall@5": 0.33,
+      "mrr": 0.3401,
+      "ndcg@10": 0.4441,
+      "proj_recall@3": 0.1723,
+      "latency_p50_s": 0.0489,
+      "latency_p95_s": 0.1416,
+      "variant": "v5_multivector",
+      "persona": "ai_ml",
+      "n_bid_jobs": 100,
+      "index_build_s": 0.0,
+      "config": {
+        "name": "v5_multivector",
+        "query": "post",
+        "retrieval": "dense",
+        "rerank": false,
+        "outcome": false,
+        "multivector": true,
+        "corrective": false
+      }
+    },
+    {
+      "recall@5": 0.4335,
+      "mrr": 0.4512,
+      "ndcg@10": 0.5123,
+      "proj_recall@3": 0.2709,
+      "latency_p50_s": 0.0558,
+      "latency_p95_s": 0.1757,
+      "variant": "v5_multivector",
+      "persona": "fullstack",
+      "n_bid_jobs": 100,
+      "index_build_s": 0.0,
+      "config": {
+        "name": "v5_multivector",
+        "query": "post",
+        "retrieval": "dense",
+        "rerank": false,
+        "outcome": false,
+        "multivector": true,
+        "corrective": false
+      }
+    },
+    {
+      "recall@5": 0.4471,
+      "mrr": 0.4465,
+      "ndcg@10": 0.5489,
+      "proj_recall@3": 0.2057,
+      "latency_p50_s": 0.0605,
+      "latency_p95_s": 0.2003,
+      "variant": "v5_multivector",
+      "persona": "data_analyst",
+      "n_bid_jobs": 85,
+      "index_build_s": 0.0,
+      "config": {
+        "name": "v5_multivector",
+        "query": "post",
+        "retrieval": "dense",
+        "rerank": false,
+        "outcome": false,
+        "multivector": true,
+        "corrective": false
+      }
+    },
+    {
+      "variant": "v5_multivector",
+      "persona": "ALL",
+      "recall@5": 0.4012,
+      "mrr": 0.4108,
+      "ndcg@10": 0.4993,
+      "proj_recall@3": 0.2169,
+      "latency_p50_s": 0.0558,
+      "latency_p95_s": 0.1663,
+      "n_bid_jobs": 285,
+      "by_job_type": {
+        "1-3 requirements": {
+          "recall@5": 0.404,
+          "mrr": 0.4221,
+          "ndcg@10": 0.505,
+          "proj_recall@3": 0.201,
+          "latency_p50_s": 0.0292,
+          "latency_p95_s": 0.1169,
+          "n": 136
+        },
+        "4+ requirements": {
+          "recall@5": 0.3987,
+          "mrr": 0.4005,
+          "ndcg@10": 0.4941,
+          "proj_recall@3": 0.2314,
+          "latency_p50_s": 0.0861,
+          "latency_p95_s": 0.198,
+          "n": 149
+        }
+      }
+    },
+    {
+      "recall@5": 0.2885,
+      "mrr": 0.3465,
+      "ndcg@10": 0.3617,
+      "proj_recall@3": 0.302,
+      "latency_p50_s": 1.1552,
+      "latency_p95_s": 2.797,
+      "variant": "v8_corrective",
+      "persona": "ai_ml",
+      "n_bid_jobs": 100,
+      "index_build_s": 0.0,
+      "config": {
+        "name": "v8_corrective",
+        "query": "post",
+        "retrieval": "dense",
+        "rerank": false,
+        "outcome": false,
+        "multivector": false,
+        "corrective": true
+      },
+      "false_refusal_rate_on_bid": 0.31,
+      "refusal_rate_on_nofit": 0.898
+    },
+    {
+      "recall@5": 0.3205,
+      "mrr": 0.4448,
+      "ndcg@10": 0.3961,
+      "proj_recall@3": 0.3746,
+      "latency_p50_s": 1.1772,
+      "latency_p95_s": 2.7743,
+      "variant": "v8_corrective",
+      "persona": "fullstack",
+      "n_bid_jobs": 100,
+      "index_build_s": 0.0,
+      "config": {
+        "name": "v8_corrective",
+        "query": "post",
+        "retrieval": "dense",
+        "rerank": false,
+        "outcome": false,
+        "multivector": false,
+        "corrective": true
+      },
+      "false_refusal_rate_on_bid": 0.2,
+      "refusal_rate_on_nofit": 0.7414
+    },
+    {
+      "recall@5": 0.2588,
+      "mrr": 0.318,
+      "ndcg@10": 0.2947,
+      "proj_recall@3": 0.2731,
+      "latency_p50_s": 1.096,
+      "latency_p95_s": 2.9733,
+      "variant": "v8_corrective",
+      "persona": "data_analyst",
+      "n_bid_jobs": 85,
+      "index_build_s": 0.0,
+      "config": {
+        "name": "v8_corrective",
+        "query": "post",
+        "retrieval": "dense",
+        "rerank": false,
+        "outcome": false,
+        "multivector": false,
+        "corrective": true
+      },
+      "false_refusal_rate_on_bid": 0.5059,
+      "refusal_rate_on_nofit": 0.8143
+    },
+    {
+      "variant": "v8_corrective",
+      "persona": "ALL",
+      "recall@5": 0.2909,
+      "mrr": 0.3725,
+      "ndcg@10": 0.3538,
+      "proj_recall@3": 0.3189,
+      "latency_p50_s": 1.1234,
+      "latency_p95_s": 2.7743,
+      "n_bid_jobs": 285,
+      "by_job_type": {
+        "1-3 requirements": {
+          "recall@5": 0.2816,
+          "mrr": 0.3471,
+          "ndcg@10": 0.3384,
+          "proj_recall@3": 0.2996,
+          "latency_p50_s": 1.0138,
+          "latency_p95_s": 2.7216,
+          "n": 136
+        },
+        "4+ requirements": {
+          "recall@5": 0.2993,
+          "mrr": 0.3958,
+          "ndcg@10": 0.3678,
+          "proj_recall@3": 0.3365,
+          "latency_p50_s": 1.1772,
+          "latency_p95_s": 2.92,
+          "n": 149
+        }
+      }
+    }
+  ]
+}

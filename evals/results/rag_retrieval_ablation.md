@@ -1,0 +1,52 @@
+Embeddings `BAAI/bge-small-en-v1.5`, reranker `jinaai/jina-reranker-v1-turbo-en`, pool `portfolio`, generated 2026-11-14T04:41:14Z.
+
+| Variant | Persona | Recall@5 | MRR | nDCG@10 | ProjRecall@3 | p95 latency (s) |
+|---|---|---|---|---|---|---|
+| best_fast | ai_ml | 0.488 | 0.536 | 0.612 | 0.254 | 0.26 |
+| best_fast | fullstack | 0.404 | 0.456 | 0.497 | 0.246 | 0.23 |
+| best_fast | data_analyst | 0.381 | 0.424 | 0.485 | 0.169 | 0.18 |
+| best_fast | ALL | 0.427 | 0.474 | 0.533 | 0.226 | 0.20 |
+| best_full | ai_ml | 0.508 | 0.562 | 0.609 | 0.254 | 5.84 |
+| best_full | fullstack | 0.420 | 0.462 | 0.508 | 0.242 | 5.31 |
+| best_full | data_analyst | 0.419 | 0.469 | 0.553 | 0.206 | 4.36 |
+| best_full | ALL | 0.451 | 0.499 | 0.557 | 0.236 | 5.06 |
+| best_fast-bm25 | ai_ml | 0.402 | 0.455 | 0.489 | 0.190 | 0.17 |
+| best_fast-bm25 | fullstack | 0.396 | 0.428 | 0.484 | 0.267 | 0.17 |
+| best_fast-bm25 | data_analyst | 0.353 | 0.426 | 0.468 | 0.181 | 0.17 |
+| best_fast-bm25 | ALL | 0.385 | 0.437 | 0.481 | 0.214 | 0.17 |
+| best_fast-dense | ai_ml | 0.502 | 0.537 | 0.651 | 0.273 | 0.01 |
+| best_fast-dense | fullstack | 0.394 | 0.453 | 0.433 | 0.211 | 0.01 |
+| best_fast-dense | data_analyst | 0.311 | 0.380 | 0.442 | 0.166 | 0.01 |
+| best_fast-dense | ALL | 0.407 | 0.461 | 0.512 | 0.219 | 0.01 |
+| best_fast-outcome | ai_ml | 0.442 | 0.445 | 0.573 | 0.237 | 0.16 |
+| best_fast-outcome | fullstack | 0.475 | 0.476 | 0.554 | 0.293 | 0.15 |
+| best_fast-outcome | data_analyst | 0.471 | 0.480 | 0.589 | 0.224 | 0.16 |
+| best_fast-outcome | ALL | 0.462 | 0.466 | 0.571 | 0.253 | 0.16 |
+| best_fast-multivector | ai_ml | 0.472 | 0.607 | 0.532 | 0.455 | 0.17 |
+| best_fast-multivector | fullstack | 0.373 | 0.558 | 0.452 | 0.489 | 0.17 |
+| best_fast-multivector | data_analyst | 0.402 | 0.503 | 0.510 | 0.340 | 0.16 |
+| best_fast-multivector | ALL | 0.416 | 0.559 | 0.498 | 0.433 | 0.16 |
+| best_full-decompose | ai_ml | 0.436 | 0.492 | 0.557 | 0.217 | 0.79 |
+| best_full-decompose | fullstack | 0.412 | 0.475 | 0.478 | 0.281 | 0.83 |
+| best_full-decompose | data_analyst | 0.301 | 0.355 | 0.434 | 0.150 | 0.78 |
+| best_full-decompose | ALL | 0.388 | 0.445 | 0.493 | 0.220 | 0.80 |
+| best_full-bm25 | ai_ml | 0.458 | 0.501 | 0.523 | 0.221 | 1.80 |
+| best_full-bm25 | fullstack | 0.438 | 0.484 | 0.517 | 0.287 | 1.81 |
+| best_full-bm25 | data_analyst | 0.468 | 0.534 | 0.577 | 0.233 | 1.65 |
+| best_full-bm25 | ALL | 0.454 | 0.505 | 0.537 | 0.248 | 1.73 |
+| best_full-dense | ai_ml | 0.508 | 0.543 | 0.609 | 0.258 | 6.15 |
+| best_full-dense | fullstack | 0.381 | 0.393 | 0.466 | 0.248 | 6.20 |
+| best_full-dense | data_analyst | 0.464 | 0.505 | 0.576 | 0.205 | 5.52 |
+| best_full-dense | ALL | 0.450 | 0.479 | 0.549 | 0.238 | 6.08 |
+| best_full-rerank | ai_ml | 0.508 | 0.554 | 0.615 | 0.236 | 0.16 |
+| best_full-rerank | fullstack | 0.484 | 0.520 | 0.529 | 0.294 | 0.17 |
+| best_full-rerank | data_analyst | 0.445 | 0.490 | 0.555 | 0.217 | 0.12 |
+| best_full-rerank | ALL | 0.481 | 0.523 | 0.567 | 0.251 | 0.15 |
+| best_full-outcome | ai_ml | 0.448 | 0.454 | 0.584 | 0.242 | 0.14 |
+| best_full-outcome | fullstack | 0.439 | 0.424 | 0.531 | 0.254 | 0.14 |
+| best_full-outcome | data_analyst | 0.501 | 0.517 | 0.604 | 0.235 | 0.12 |
+| best_full-outcome | ALL | 0.461 | 0.462 | 0.571 | 0.244 | 0.13 |
+| best_full-multivector | ai_ml | 0.458 | 0.622 | 0.535 | 0.454 | 0.14 |
+| best_full-multivector | fullstack | 0.379 | 0.554 | 0.478 | 0.460 | 0.15 |
+| best_full-multivector | data_analyst | 0.489 | 0.567 | 0.561 | 0.376 | 0.11 |
+| best_full-multivector | ALL | 0.440 | 0.582 | 0.523 | 0.433 | 0.13 |

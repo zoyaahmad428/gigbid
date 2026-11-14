@@ -1,0 +1,283 @@
+{
+  "generated_at": "2026-11-14T05:17:23Z",
+  "chosen_thresholds": {
+    "supported": 0.4,
+    "partly": 0.1
+  },
+  "objective": "fabrication_recall - 2 * true_claims_removed (on the tune split)",
+  "test": {
+    "n": 125,
+    "fabrication_recall": 0.9306,
+    "unsupported_precision": 1.0,
+    "true_claims_removed": 0.0,
+    "true_claims_fully_supported": 1.0,
+    "not_a_claim_accuracy": 1.0,
+    "by_kind": {
+      "invented": {
+        "n": 6,
+        "pred": {
+          "supported": 0,
+          "partly_supported": 1,
+          "unsupported": 5,
+          "not_a_claim": 0
+        }
+      },
+      "plan": {
+        "n": 9,
+        "pred": {
+          "supported": 0,
+          "partly_supported": 0,
+          "unsupported": 0,
+          "not_a_claim": 9
+        }
+      },
+      "true": {
+        "n": 44,
+        "pred": {
+          "supported": 44,
+          "partly_supported": 0,
+          "unsupported": 0,
+          "not_a_claim": 0
+        },
+        "cited_unsupported_rate": 0.0
+      },
+      "wrong_number": {
+        "n": 44,
+        "pred": {
+          "supported": 1,
+          "partly_supported": 2,
+          "unsupported": 41,
+          "not_a_claim": 0
+        },
+        "cited_unsupported_rate": 0.9474
+      },
+      "wrong_skill": {
+        "n": 22,
+        "pred": {
+          "supported": 0,
+          "partly_supported": 1,
+          "unsupported": 21,
+          "not_a_claim": 0
+        }
+      }
+    }
+  },
+  "test_by_persona": {
+    "ai_ml": {
+      "n": 40,
+      "fabrication_recall": 0.913,
+      "unsupported_precision": 1.0,
+      "true_claims_removed": 0.0,
+      "true_claims_fully_supported": 1.0,
+      "not_a_claim_accuracy": 1.0,
+      "by_kind": {
+        "invented": {
+          "n": 2,
+          "pred": {
+            "supported": 0,
+            "partly_supported": 0,
+            "unsupported": 2,
+            "not_a_claim": 0
+          }
+        },
+        "plan": {
+          "n": 3,
+          "pred": {
+            "supported": 0,
+            "partly_supported": 0,
+            "unsupported": 0,
+            "not_a_claim": 3
+          }
+        },
+        "true": {
+          "n": 14,
+          "pred": {
+            "supported": 14,
+            "partly_supported": 0,
+            "unsupported": 0,
+            "not_a_claim": 0
+          },
+          "cited_unsupported_rate": 0.0
+        },
+        "wrong_number": {
+          "n": 14,
+          "pred": {
+            "supported": 1,
+            "partly_supported": 0,
+            "unsupported": 13,
+            "not_a_claim": 0
+          },
+          "cited_unsupported_rate": 1.0
+        },
+        "wrong_skill": {
+          "n": 7,
+          "pred": {
+            "supported": 0,
+            "partly_supported": 1,
+            "unsupported": 6,
+            "not_a_claim": 0
+          }
+        }
+      }
+    },
+    "fullstack": {
+      "n": 50,
+      "fabrication_recall": 0.931,
+      "unsupported_precision": 1.0,
+      "true_claims_removed": 0.0,
+      "true_claims_fully_supported": 1.0,
+      "not_a_claim_accuracy": 1.0,
+      "by_kind": {
+        "invented": {
+          "n": 2,
+          "pred": {
+            "supported": 0,
+            "partly_supported": 1,
+            "unsupported": 1,
+            "not_a_claim": 0
+          }
+        },
+        "plan": {
+          "n": 3,
+          "pred": {
+            "supported": 0,
+            "partly_supported": 0,
+            "unsupported": 0,
+            "not_a_claim": 3
+          }
+        },
+        "true": {
+          "n": 18,
+          "pred": {
+            "supported": 18,
+            "partly_supported": 0,
+            "unsupported": 0,
+            "not_a_claim": 0
+          },
+          "cited_unsupported_rate": 0.0
+        },
+        "wrong_number": {
+          "n": 18,
+          "pred": {
+            "supported": 0,
+            "partly_supported": 1,
+            "unsupported": 17,
+            "not_a_claim": 0
+          },
+          "cited_unsupported_rate": 0.875
+        },
+        "wrong_skill": {
+          "n": 9,
+          "pred": {
+            "supported": 0,
+            "partly_supported": 0,
+            "unsupported": 9,
+            "not_a_claim": 0
+          }
+        }
+      }
+    },
+    "data_analyst": {
+      "n": 35,
+      "fabrication_recall": 0.95,
+      "unsupported_precision": 1.0,
+      "true_claims_removed": 0.0,
+      "true_claims_fully_supported": 1.0,
+      "not_a_claim_accuracy": 1.0,
+      "by_kind": {
+        "invented": {
+          "n": 2,
+          "pred": {
+            "supported": 0,
+            "partly_supported": 0,
+            "unsupported": 2,
+            "not_a_claim": 0
+          }
+        },
+        "plan": {
+          "n": 3,
+          "pred": {
+            "supported": 0,
+            "partly_supported": 0,
+            "unsupported": 0,
+            "not_a_claim": 3
+          }
+        },
+        "true": {
+          "n": 12,
+          "pred": {
+            "supported": 12,
+            "partly_supported": 0,
+            "unsupported": 0,
+            "not_a_claim": 0
+          },
+          "cited_unsupported_rate": 0.0
+        },
+        "wrong_number": {
+          "n": 12,
+          "pred": {
+            "supported": 0,
+            "partly_supported": 1,
+            "unsupported": 11,
+            "not_a_claim": 0
+          },
+          "cited_unsupported_rate": 1.0
+        },
+        "wrong_skill": {
+          "n": 6,
+          "pred": {
+            "supported": 0,
+            "partly_supported": 0,
+            "unsupported": 6,
+            "not_a_claim": 0
+          }
+        }
+      }
+    }
+  },
+  "examples": [
+    {
+      "claim": "I built the churn prediction model with Rust.",
+      "kind": "wrong_skill",
+      "gold": "unsupported",
+      "split": "test",
+      "pred": "partly_supported",
+      "score": 0.4113
+    },
+    {
+      "claim": "For a healthcare client I cut release time for a new model from 3 days to 15.",
+      "kind": "wrong_number",
+      "gold": "unsupported",
+      "split": "test",
+      "cite": false,
+      "pred": "supported",
+      "score": 0.921
+    },
+    {
+      "claim": "For a manufacturing client I onboarded 40 paying customers in the first quarter.",
+      "kind": "wrong_number",
+      "gold": "unsupported",
+      "split": "test",
+      "cite": true,
+      "pred": "partly_supported",
+      "score": 0.7327
+    },
+    {
+      "claim": "I migrated a hospital network's records system to the cloud, serving 2 million patients.",
+      "kind": "invented",
+      "gold": "unsupported",
+      "split": "test",
+      "pred": "partly_supported",
+      "score": 0.1046
+    },
+    {
+      "claim": "For a B21B SaaS client I found that 34% of spend went to channels with no measurable return.",
+      "kind": "wrong_number",
+      "gold": "unsupported",
+      "split": "test",
+      "cite": false,
+      "pred": "partly_supported",
+      "score": 0.9748
+    }
+  ]
+}
