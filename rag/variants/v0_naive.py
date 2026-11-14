@@ -1,3 +1,4 @@
-def retrieve(query: str, index, k: int = 5):
-    # TODO: Implement the mandatory baseline: dense top-k cosine retrieval.
-    raise NotImplementedError
+"""V0 baseline: fixed word chunks, dense top-k cosine on the whole job post."""
+from rag.pipeline import Config
+
+CONFIG = Config(name="v0_naive", query="post", retrieval="dense")
