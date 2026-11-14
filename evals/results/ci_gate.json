@@ -1,0 +1,32 @@
+{
+ "injection": {
+  "recall": 0.8889,
+  "false_positive_rate": 0.0142,
+  "n_positive": 36,
+  "n_negative": 564
+ },
+ "scam": {
+  "recall": 1.0,
+  "false_positive_rate": 0.029,
+  "n_positive": 48,
+  "n_negative": 552
+ },
+ "retrieval": {
+  "variant": "combined",
+  "n_jobs": 285,
+  "recall@5": 0.5882,
+  "mrr": 0.6419,
+  "ndcg@10": 0.6703
+ },
+ "verification": {
+  "thresholds": {
+   "supported": 0.4,
+   "partly": 0.1
+  },
+  "n": 125,
+  "fabrication_recall": 0.9306,
+  "true_claims_removed": 0.0,
+  "not_a_claim_accuracy": 1.0
+ },
+ "seconds": 23.0
+}

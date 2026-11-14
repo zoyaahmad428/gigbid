@@ -1,0 +1,15 @@
+{
+ "tolerance": 0.02,
+ "metrics": {
+  "injection.recall": 0.8889,
+  "injection.false_positive_rate": 0.0142,
+  "scam.recall": 1.0,
+  "scam.false_positive_rate": 0.029,
+  "retrieval.recall@5": 0.5882,
+  "retrieval.mrr": 0.6419,
+  "retrieval.ndcg@10": 0.6703,
+  "verification.fabrication_recall": 0.9306,
+  "verification.true_claims_removed": 0.0,
+  "verification.not_a_claim_accuracy": 1.0
+ }
+}

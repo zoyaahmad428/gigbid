@@ -189,3 +189,37 @@ def test_interview_slots_are_written_for_people():
     from agent.nodes.client_liaison import human_slot
     assert human_slot("2026-11-16T09:00:00+05:00") == "Mon 16 Nov, 09:00-09:30 (UTC+5)"
     assert human_slot("2026-11-16T09:00:00-03:30") == "Mon 16 Nov, 09:00-09:30 (UTC-3:30)"
+
+
+def test_langfuse_export_sends_one_trace_per_thread_and_masks_inputs():
+    import json
+    from agent.trace import LangfuseExporter
+    sent = []
+    ex = LangfuseExporter("https://lf.example", "pk", "sk", post=sent.extend, interval=60)
+    args = ("bid:u_1:job_9", "writer", "llm", "openai/gpt-oss-120b", {"user": "mail me at sana@gmail.com"},
+            "draft", True, 1200.0, 900, 300, 0.0012)
+    first = ex.events_for(*args)
+    second = ex.events_for(*args[:2], "tool", "search_evidence", {"q": "rag"}, {"hits": []}, False, 40.0, 0, 0, 0.0)
+    assert [e["type"] for e in first] == ["trace-create", "generation-create"]
+    assert [e["type"] for e in second] == ["span-create"]                  # the trace is created once
+    trace, gen = first[0]["body"], first[1]["body"]
+    assert trace["sessionId"] == "bid:u_1:job_9" and trace["userId"] == "u_1"
+    assert gen["traceId"] == trace["id"] == second[0]["body"]["traceId"]
+    assert gen["usage"]["total"] == 1200 and gen["usage"]["totalCost"] == 0.0012
+    assert "sana@gmail.com" not in json.dumps(gen["input"])                # PII masked before export
+    assert second[0]["body"]["level"] == "ERROR"
+    ex.emit(*args)
+    ex.flush()
+    assert len(sent) == 1 and sent[0]["type"] == "generation-create"
+
+
+def test_eval_gate_fails_on_a_drop_and_respects_lower_is_better():
+    from evals.runners.ci_gate import compare
+    base = {"retrieval.mrr": 0.64, "scam.false_positive_rate": 0.03, "verification.true_claims_removed": 0.0}
+    ok = {k: ok for k, _, _, ok in compare({"retrieval.mrr": 0.63, "scam.false_positive_rate": 0.04,
+                                            "verification.true_claims_removed": 0.01}, base)}
+    assert all(ok.values())                                   # within the 0.02 tolerance
+    bad = {k: ok for k, _, _, ok in compare({"retrieval.mrr": 0.60, "scam.false_positive_rate": 0.08,
+                                             "verification.true_claims_removed": 0.05}, base)}
+    assert not any(bad.values())                              # a drop, or a rise where lower is better
+    assert compare({"retrieval.mrr": 0.99}, base)[0][3]       # improvements pass
