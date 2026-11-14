@@ -2,7 +2,8 @@ name: CI
 
 # Every push and pull request: lint, all tests (SQLite, plus Postgres and Redis services for the
 # checkpointer and the worker queue), the offline evaluation gate, the web app's type check,
-# lint, build and browser tests, and a build of the Docker image. No secrets are needed.
+# lint, build and browser tests, and a build of the Docker image, published to ghcr.io from main.
+# No secrets are needed beyond GitHub's own token (the LLM smoke evaluation is optional).
 
 on:
   push:
@@ -21,6 +22,19 @@ env:
   RAG_MODEL_CACHE: ${{ github.workspace }}/.models
 
 jobs:
+  rules:
+    name: Repository rules
+    # The brief's CI rules: no secrets; nothing under gigsim/ changed; every prompt in agent/prompts/;
+    # every number in README.md and the report traces to evals/results/ (infra/ci/check_repo_rules.py).
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+      - run: python infra/ci/check_repo_rules.py
+
   python:
     name: Lint and tests
     runs-on: ubuntu-24.04
@@ -85,6 +99,41 @@ jobs:
           name: ci-gate
           path: evals/results/ci_gate.json
 
+  smoke-eval:
+    name: 30-job smoke evaluation (LLM)
+    # Pull requests only, and only when the repository has a GROQ_API_KEY secret: one run uses about
+    # 150k tokens, a large share of the free tier's daily limit. Fails if bid-or-skip F1 drops or the
+    # unsupported-claim rate rises past evals/baselines/smoke_gate.json.
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    env:
+      OPENAI_API_KEY: ${{ secrets.GROQ_API_KEY }}
+      GIGBID_RATE_WAIT: "3600"
+    steps:
+      - name: Skip without a key
+        id: key
+        run: echo "present=$([ -n "$OPENAI_API_KEY" ] && echo yes || echo no)" >> "$GITHUB_OUTPUT"
+      - uses: actions/checkout@v4
+        if: steps.key.outputs.present == 'yes'
+      - uses: actions/setup-python@v5
+        if: steps.key.outputs.present == 'yes'
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+          cache-dependency-path: pyproject.toml
+      - uses: actions/cache@v4
+        if: steps.key.outputs.present == 'yes'
+        with:
+          path: .models
+          key: models-${{ hashFiles('agent/config.yaml') }}
+      - if: steps.key.outputs.present == 'yes'
+        run: python -m pip install -e ".[dev]"
+      - if: steps.key.outputs.present == 'yes'
+        run: python -m evals.runners.graph_runs --set smoke --stop critic --tag smoke
+      - if: steps.key.outputs.present == 'yes'
+        run: python -m evals.runners.smoke_gate
+
   web:
     name: Web app
     runs-on: ubuntu-24.04
@@ -114,6 +163,9 @@ jobs:
     name: Docker image
     runs-on: ubuntu-24.04
     timeout-minutes: 30
+    permissions:
+      contents: read
+      packages: write             # pushes to ghcr.io on main (the published Portfolio MCP server runs from it)
     steps:
       - uses: actions/checkout@v4
       - uses: docker/setup-buildx-action@v3
@@ -139,3 +191,12 @@ jobs:
           curl -fsS localhost:7860/api/account -H "authorization: Bearer $TOKEN"
       - if: always()
         run: docker logs gigbid 2>&1 | tail -60
+      - name: Publish to GitHub Container Registry (main only, after the smoke test passed)
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: |
+          IMAGE=ghcr.io/${GITHUB_REPOSITORY,,}
+          echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
+          docker tag gigbid:ci "$IMAGE:latest"
+          docker tag gigbid:ci "$IMAGE:${GITHUB_SHA::7}"
+          docker push "$IMAGE:latest"
+          docker push "$IMAGE:${GITHUB_SHA::7}"
