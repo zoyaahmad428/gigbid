@@ -74,7 +74,7 @@ export default function RunPage() {
   if (error) return <ErrorNote error={error} />;
   if (!d) return <Spinner />;
   const isBid = d.run.kind === "bid";
-  const running = d.busy || d.run.status === "running";
+  const running = d.busy || d.run.status === "running" || d.run.status === "queued";
   const status = running ? "running" : d.pending_approval ? "awaiting_approval" : liveStatus ?? d.run.status;
   const defaultTab = d.pending_approval || (isBid && d.values.draft) || (!isBid && d.values.reply) ? "work" : "run";
   const current = tab ?? defaultTab;

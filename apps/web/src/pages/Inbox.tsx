@@ -55,7 +55,7 @@ export default function Inbox() {
   }, [load]);
 
   // refresh run badges while something is running
-  const anyRunning = !!page?.jobs.some((j) => j.run?.status === "running");
+  const anyRunning = !!page?.jobs.some((j) => ["running", "queued"].includes(j.run?.status ?? ""));
   usePoll(async () => {
     if (!page) return;
     const p = new URLSearchParams(params);

@@ -45,6 +45,10 @@ export default function SettingsPage() {
               <input type="checkbox" checked={!!s.autonomy_auto_skip} onChange={(e) => set({ autonomy_auto_skip: e.target.checked })} />
               <span>Skip clear misfits and scams without asking me <span className="hint">Sending always needs your approval.</span></span>
             </label>
+            <label className="check wide">
+              <input type="checkbox" checked={!!s.auto_scout} onChange={(e) => set({ auto_scout: e.target.checked })} />
+              <span>Look for new jobs every 30 minutes <span className="hint">Drafts wait in Approvals; needs the worker (docker compose).</span></span>
+            </label>
             <label className="wide">Marketplace token<input value={s.marketplace_token ?? ""} onChange={(e) => set({ marketplace_token: e.target.value })} /></label>
             <p className="hint wide">Portfolio: <strong>{s.persona}</strong> (chosen at onboarding).</p>
           </div>

@@ -65,7 +65,7 @@ function Thread({ id }: { id: string }) {
   if (!p) return <Spinner />;
   const msgs: any[] = p.messages ?? [];
   const lastClient = msgs.length > 0 && msgs[msgs.length - 1].sender === "client";
-  const openRun = p.reply_runs?.find((r: any) => ["awaiting_approval", "running"].includes(r.status));
+  const openRun = p.reply_runs?.find((r: any) => ["awaiting_approval", "running", "queued"].includes(r.status));
 
   return (
     <Card title={<>Proposal <code>{p.proposal_id}</code></>} actions={<Badge status={p.status} />}>
@@ -87,7 +87,7 @@ function Thread({ id }: { id: string }) {
       <div className="row gap-s">
         {openRun ? (
           <Link className="button primary" to={`/runs/${enc(openRun.thread_id)}`}>
-            {openRun.status === "running" ? "Reply being drafted…" : "Review drafted reply"}
+            {openRun.status !== "awaiting_approval" ? "Reply being drafted…" : "Review drafted reply"}
           </Link>
         ) : (
           lastClient && <button className="primary" disabled={busy} onClick={draft}>{busy ? "Starting…" : "Draft a reply"}</button>

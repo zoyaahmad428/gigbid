@@ -3,6 +3,7 @@ import { ReactNode } from "react";
 const STATUS_TONE: Record<string, string> = {
   awaiting_approval: "warn",
   running: "info",
+  queued: "info",
   submitted: "good",
   replied: "good",
   interview: "good",

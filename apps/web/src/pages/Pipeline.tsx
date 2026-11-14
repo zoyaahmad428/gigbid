@@ -4,7 +4,7 @@ import { useApi, usePoll } from "../hooks";
 import { Badge, Empty, ErrorNote, money, Spinner } from "../ui";
 
 const LANES: [string, string, (s: string) => boolean][] = [
-  ["Analysing", "agents at work", (s) => s === "running"],
+  ["Analysing", "agents at work", (s) => s === "running" || s === "queued"],
   ["Needs you", "waiting for approval", (s) => s === "awaiting_approval"],
   ["Watching", "fit or budget was borderline", (s) => s === "watching"],
   ["Sent", "submitted, no reply yet", (s) => ["submitted", "viewed"].includes(s)],

@@ -9,7 +9,7 @@ export default function Approvals({ all = false }: { all?: boolean }) {
   const [filter, setFilter] = useState("");
   const path = all ? `/runs${filter ? `?status=${filter}` : ""}` : "/approvals";
   const { data, error, reload } = useApi<{ runs: Run[] }>(path);
-  usePoll(reload, 4000, !!data?.runs.some((r) => r.status === "running"));
+  usePoll(reload, 4000, !!data?.runs.some((r) => ["running", "queued"].includes(r.status)));
 
   return (
     <div className="page">
@@ -25,7 +25,7 @@ export default function Approvals({ all = false }: { all?: boolean }) {
         {all && (
           <select value={filter} onChange={(e) => setFilter(e.target.value)} aria-label="Filter by status">
             <option value="">All statuses</option>
-            {["running", "awaiting_approval", "submitted", "replied", "watching", "skipped", "rejected", "blocked", "degraded", "dead_letter", "interrupted", "failed"].map((s) => (
+            {["queued", "running", "awaiting_approval", "submitted", "replied", "watching", "skipped", "rejected", "blocked", "degraded", "dead_letter", "interrupted", "failed"].map((s) => (
               <option key={s} value={s}>{s.replace(/_/g, " ")}</option>
             ))}
           </select>

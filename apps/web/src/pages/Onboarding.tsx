@@ -103,6 +103,13 @@ export default function Onboarding() {
                 <span className="hint">Skipping costs nothing and sends nothing. You can still open a skipped job and choose “bid anyway”.</span>
               </span>
             </label>
+            <label className="check wide">
+              <input type="checkbox" checked={!!s.auto_scout} onChange={(e) => set({ auto_scout: e.target.checked })} />
+              <span>
+                <strong>Look for new jobs for me every 30 minutes</strong>
+                <span className="hint">GigBid analyses up to two new jobs in your category each time and drafts proposals for good fits. Drafts wait in Approvals.</span>
+              </span>
+            </label>
             <div className="note wide">
               Proposals and client messages are <strong>always</strong> shown to you first. GigBid cannot send
               anything or spend Connects without your approval, and this cannot be turned off.

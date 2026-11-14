@@ -68,6 +68,7 @@ export interface Settings {
   min_fixed_budget: number;
   marketplace_token: string;
   autonomy_auto_skip: boolean;
+  auto_scout?: boolean;
   timezone: string;
   weekly_connects_budget: number;
 }
