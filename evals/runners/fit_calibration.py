@@ -79,7 +79,9 @@ def predict(r: dict, th: dict) -> tuple[float, bool]:
 def evaluate(rows: list[dict], th: dict) -> dict:
     pos = [r for r in rows if r["label"] == 1]
     neg = [r for r in rows if r["label"] == 0]
-    bid = lambda r: predict(r, th)[0] >= th["minimum_fit_score"]
+    def bid(r):
+        return predict(r, th)[0] >= th["minimum_fit_score"]
+
     tpr = sum(bid(r) for r in pos) / max(1, len(pos))
     tnr = sum(not bid(r) for r in neg) / max(1, len(neg))
     refused_pos = sum(predict(r, th)[1] for r in pos) / max(1, len(pos))

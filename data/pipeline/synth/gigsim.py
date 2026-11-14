@@ -288,11 +288,15 @@ def build_live(live_jobs: list[dict], cfg: dict, rng: random.Random) -> tuple[li
     for j in rng.sample(live_jobs, int(round(n * lc["injection_rate"]))):
         inj, lab = injected_copy(rng, j)
         inj["posted_at"] = ts()
-        stream.append(inj); labels.append(lab)
+        stream.append(inj)
+        labels.append(lab)
 
     for _ in range(int(round(n * lc["scam_rate"]))):
         job, lab, pub, hid = scam_job(rng, rng.choice(P_IDS + [None]), ts())
-        stream.append(job); labels.append(lab); pubs.append(pub); hids.append(hid)
+        stream.append(job)
+        labels.append(lab)
+        pubs.append(pub)
+        hids.append(hid)
 
     for j in rng.sample(live_jobs, int(round(n * lc["duplicate_rate"]))):
         d = dict(j)
@@ -422,7 +426,8 @@ def build_dev(persona: str, on_topic: list[dict], off_topic: list[dict], corpus:
     for _ in range(n_scam):
         ts = dt.datetime(2026, 10, rng.randint(1, 28), rng.randint(0, 23), tzinfo=dt.timezone.utc).isoformat()
         job, _, pub, hid = scam_job(rng, persona, ts)
-        pubs.append(pub); hids.append(hid)
+        pubs.append(pub)
+        hids.append(hid)
         items.append(DevItem(job=Job(**job), persona=persona, gold_action="skip", skip_reason="scam",
                              is_scam=True, has_injection=False, relevant_projects=[], relevant_evidence=[],
                              fair_price_band=Budget(type=job["budget"]["type"], min=0.0, max=0.0)).model_dump())

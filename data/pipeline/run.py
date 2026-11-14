@@ -215,9 +215,9 @@ def summarise(gs: Path, pdir: Path, devdir: Path) -> dict:
                               "by_category": dict(Counter(j["category"] for j in hist)),
                               "by_dataset": dict(Counter(j["provenance"]["source_dataset"] for j in hist))}
     out["jobs_live"] = {"n": len(live), "by_source": _prov_counts(live),
-                        "duplicates": sum(l["is_duplicate"] for l in labels),
-                        "scams": sum(l["is_scam"] for l in labels),
-                        "injections": sum(l["has_injection"] for l in labels)}
+                        "duplicates": sum(x["is_duplicate"] for x in labels),
+                        "scams": sum(x["is_scam"] for x in labels),
+                        "injections": sum(x["has_injection"] for x in labels)}
     cl = read_jsonl(gs / "clients.jsonl")
     out["clients"] = {"n": len(cl), "by_source": _prov_counts(cl)}
     for p in gigsim.P_IDS:

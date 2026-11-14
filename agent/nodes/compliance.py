@@ -3,7 +3,6 @@ then a small model for what rules miss. Can block, with a reason shown to the us
 from __future__ import annotations
 
 import re
-from pathlib import Path
 
 from agent.guards import CANARY_RE
 from agent.handoffs import ComplianceVerdict

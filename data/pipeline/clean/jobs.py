@@ -150,7 +150,9 @@ def clean_pool(raw: Path) -> tuple[pd.DataFrame, dict]:
     for t, d in zip(df["title"], df["description"]):
         t2, k1 = mask_pii(t)
         d2, k2 = mask_pii(d)
-        masked_t.append(t2); masked_d.append(d2); pii += k1 + k2
+        masked_t.append(t2)
+        masked_d.append(d2)
+        pii += k1 + k2
     df["title"], df["description"] = masked_t, masked_d
     stats["pii_replacements"] = pii
 
@@ -161,7 +163,9 @@ def clean_pool(raw: Path) -> tuple[pd.DataFrame, dict]:
             if x not in s:
                 s.append(x)
         c, f = categorise(s, skills_in_text(title))
-        skills.append(s); cats.append(c); fits.append(f)
+        skills.append(s)
+        cats.append(c)
+        fits.append(f)
     df["skills"], df["category"], df["persona_fit"] = skills, cats, fits
 
     # Budget sanity: drop impossible values but keep the job (budget becomes unknown).

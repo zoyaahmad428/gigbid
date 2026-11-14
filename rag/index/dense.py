@@ -8,7 +8,6 @@ re-running an evaluation does not re-embed unchanged documents.
 from __future__ import annotations
 
 import hashlib
-from pathlib import Path
 
 import numpy as np
 

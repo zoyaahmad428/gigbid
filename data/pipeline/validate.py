@@ -38,8 +38,10 @@ def validate(cfg: dict | None = None) -> list[str]:
     labels = read_jsonl(gs / "_hidden" / "live_labels.jsonl")
     pub = read_jsonl(gs / "clients.jsonl")
     hid = read_jsonl(gs / "_hidden" / "clients_hidden.jsonl")
-    check(Job, hist, "jobs_historical"); check(Job, live, "jobs_live")
-    check(JobLabel, labels, "live_labels"); check(ClientPublic, pub, "clients")
+    check(Job, hist, "jobs_historical")
+    check(Job, live, "jobs_live")
+    check(JobLabel, labels, "live_labels")
+    check(ClientPublic, pub, "clients")
     check(ClientHidden, hid, "clients_hidden")
 
     # sizes
@@ -58,47 +60,53 @@ def validate(cfg: dict | None = None) -> list[str]:
         for r in rows:
             pv = r.get("provenance", {})
             if pv.get("source") not in {"real", "synthetic"}:
-                probs.append(f"{name}: record without source tag"); break
+                probs.append(f"{name}: record without source tag")
+                break
             if pv["source"] == "synthetic" and not pv.get("generator"):
-                probs.append(f"{name}: synthetic record without generator"); break
+                probs.append(f"{name}: synthetic record without generator")
+                break
     # clients referenced and hidden prefs not leaked
     cids = {c["client_id"] for c in pub}
     if {c["client_id"] for c in hid} != cids:
         probs.append("public and hidden client sets differ")
     for j in hist + live:
         if j["client_id"] not in cids:
-            probs.append(f"job {j['job_id']} references unknown client"); break
+            probs.append(f"job {j['job_id']} references unknown client")
+            break
     for c in pub:
         if HIDDEN_KEYS & set(c):
-            probs.append("hidden preference fields present in public clients"); break
+            probs.append("hidden preference fields present in public clients")
+            break
     # labels consistent with content
-    lab = {l["job_id"]: l for l in labels}
+    lab = {x["job_id"]: x for x in labels}
     byid = {j["job_id"]: j for j in live}
     if set(lab) != set(byid):
         probs.append("live labels and live jobs differ")
-    for jid, l in lab.items():
+    for jid, lb in lab.items():
         j = byid.get(jid)
         if not j:
             continue
-        if l["is_duplicate"]:
-            o = byid.get(l["dup_of"])
+        if lb["is_duplicate"]:
+            o = byid.get(lb["dup_of"])
             if not o:
-                probs.append(f"duplicate {jid} points to missing job"); continue
-            if l["dup_kind"] == "exact" and (o["description"] != j["description"] or o["title"] != j["title"]):
+                probs.append(f"duplicate {jid} points to missing job")
+                continue
+            if lb["dup_kind"] == "exact" and (o["description"] != j["description"] or o["title"] != j["title"]):
                 probs.append(f"exact duplicate {jid} differs from original")
             if j["posted_at"] <= o["posted_at"]:
                 probs.append(f"duplicate {jid} posted before its original")
-        if l["has_injection"]:
+        if lb["has_injection"]:
             src = j["provenance"].get("derived_from")
             if j["provenance"]["source"] != "synthetic" or not src:
                 probs.append(f"injected job {jid} not tagged synthetic/derived")
-        if l["is_scam"] and j["provenance"]["source"] != "synthetic":
+        if lb["is_scam"] and j["provenance"]["source"] != "synthetic":
             probs.append(f"scam {jid} not tagged synthetic")
     # PII: real text fields must be masked (synthetic scams use reserved example contacts)
     email = re.compile(r"[A-Za-z0-9._%+-]+@(?!example\.com|company\.test)[A-Za-z0-9.-]+\.[A-Za-z]{2,}")
     for j in hist + live:
         if j["provenance"]["source"] == "real" and email.search(j["description"]):
-            probs.append(f"unmasked email in {j['job_id']}"); break
+            probs.append(f"unmasked email in {j['job_id']}")
+            break
 
     # personas
     for p in PERSONAS:
@@ -116,7 +124,8 @@ def validate(cfg: dict | None = None) -> list[str]:
             probs.append(f"{p}: {len(props)} proposals != {n_prop}")
         for e in ev:
             if not e["path"].split("#")[0] or not (d / e["path"].split("#")[0]).exists():
-                probs.append(f"{p}: evidence {e['evidence_id']} path missing ({e['path']})"); break
+                probs.append(f"{p}: evidence {e['evidence_id']} path missing ({e['path']})")
+                break
         on_disk = {str(f.relative_to(d)) for f in d.rglob("*") if f.is_file()} - {
             "evidence_index.jsonl", "facts.jsonl", "profile.json", "proposals.jsonl", "reviews.jsonl", "cv.md", "cv.pdf"}
         indexed = {e["path"].split("#")[0] for e in ev}
@@ -149,13 +158,17 @@ def validate(cfg: dict | None = None) -> list[str]:
         evids = {e["evidence_id"] for e in ev}
         for x in dev:
             if any(e.startswith("prop_") for e in x["relevant_evidence"]):
-                probs.append(f"dev_{p}: proposal listed as gold evidence"); break
+                probs.append(f"dev_{p}: proposal listed as gold evidence")
+                break
             if not set(x["relevant_evidence"]) <= {e for e, g in x["evidence_grades"].items() if g == 2}:
-                probs.append(f"dev_{p}: gold evidence not graded 2"); break
+                probs.append(f"dev_{p}: gold evidence not graded 2")
+                break
             if not set(x["relevant_evidence"]) <= evids:
-                probs.append(f"dev_{p}: gold evidence id not in index"); break
+                probs.append(f"dev_{p}: gold evidence id not in index")
+                break
             if x["gold_action"] == "bid" and not x["relevant_projects"]:
-                probs.append(f"dev_{p}: bid item without relevant projects ({x['job']['job_id']})"); break
+                probs.append(f"dev_{p}: bid item without relevant projects ({x['job']['job_id']})")
+                break
     return probs
 
 
