@@ -1,0 +1,33 @@
+---
+config:
+  flowchart:
+    curve: linear
+---
+graph TD;
+	__start__([<p>__start__</p>]):::first
+	read(read)
+	intent(intent)
+	slots(slots)
+	draft_reply(draft_reply)
+	compliance(compliance)
+	approval(approval)
+	send(send)
+	__end__([<p>__end__</p>]):::last
+	__start__ --> read;
+	approval -.-> __end__;
+	approval -.-> send;
+	compliance -.-> __end__;
+	compliance -.-> approval;
+	draft_reply -.-> __end__;
+	draft_reply -.-> compliance;
+	intent -.-> __end__;
+	intent -.-> draft_reply;
+	intent -.-> slots;
+	read -.-> __end__;
+	read -.-> intent;
+	slots -.-> __end__;
+	slots -.-> draft_reply;
+	send --> __end__;
+	classDef default fill:#f2f0ff,line-height:1.2
+	classDef first fill-opacity:0
+	classDef last fill:#bfb6fc

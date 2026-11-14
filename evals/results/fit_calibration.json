@@ -1,0 +1,78 @@
+{
+ "generated_at": "2026-11-14T05:31:57Z",
+ "objective": "balanced accuracy of fit >= min_fit (bid vs no-fit) on the tune half",
+ "current": {
+  "thresholds": {
+   "evidence_proven": 0.5,
+   "evidence_partial": 0.25,
+   "minimum_fit_score": 0.55,
+   "fit_requirement_weight": 0.6
+  },
+  "tune": {
+   "n_pos": 159,
+   "n_neg": 97,
+   "bid_recall": 0.0692,
+   "nofit_rejected": 1.0,
+   "balanced_accuracy": 0.5346,
+   "false_refusals_on_bid": 0.5597
+  },
+  "test": {
+   "n_pos": 126,
+   "n_neg": 85,
+   "bid_recall": 0.0794,
+   "nofit_rejected": 0.9882,
+   "balanced_accuracy": 0.5338,
+   "false_refusals_on_bid": 0.5159
+  }
+ },
+ "chosen": {
+  "thresholds": {
+   "evidence_partial": 0.08,
+   "evidence_proven": 0.4,
+   "fit_requirement_weight": 0.45,
+   "minimum_fit_score": 0.3
+  },
+  "tune": {
+   "n_pos": 159,
+   "n_neg": 97,
+   "bid_recall": 0.9245,
+   "nofit_rejected": 0.8041,
+   "balanced_accuracy": 0.8643,
+   "false_refusals_on_bid": 0.0126
+  },
+  "test": {
+   "n_pos": 126,
+   "n_neg": 85,
+   "bid_recall": 0.9524,
+   "nofit_rejected": 0.7647,
+   "balanced_accuracy": 0.8585,
+   "false_refusals_on_bid": 0.0238
+  },
+  "test_by_persona": {
+   "ai_ml": {
+    "n_pos": 48,
+    "n_neg": 25,
+    "bid_recall": 1.0,
+    "nofit_rejected": 0.76,
+    "balanced_accuracy": 0.88,
+    "false_refusals_on_bid": 0.0
+   },
+   "fullstack": {
+    "n_pos": 40,
+    "n_neg": 28,
+    "bid_recall": 0.85,
+    "nofit_rejected": 0.7143,
+    "balanced_accuracy": 0.7821,
+    "false_refusals_on_bid": 0.075
+   },
+   "data_analyst": {
+    "n_pos": 38,
+    "n_neg": 32,
+    "bid_recall": 1.0,
+    "nofit_rejected": 0.8125,
+    "balanced_accuracy": 0.9062,
+    "false_refusals_on_bid": 0.0
+   }
+  }
+ }
+}
