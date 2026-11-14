@@ -93,8 +93,9 @@ def make_adapter(credential: str | None, **overrides: Any) -> MarketplacePort:
     cfg = {**marketplace_config(), **overrides}
     if cfg["mode"] == "gigsim":
         from mcp_servers.marketplace.adapters.gigsim import GigSimAdapter
-        return GigSimAdapter(token=credential or "", base_url=os.environ.get("GIGSIM_URL", cfg.get(
-            "gigsim_url", "http://localhost:8100")), transport=cfg.get("transport"))
+        url = os.environ.get("GIGSIM_BASE_URL") or os.environ.get("GIGSIM_URL") or cfg.get("gigsim_url",
+                                                                                          "http://localhost:8081")
+        return GigSimAdapter(token=credential or "", base_url=url, transport=cfg.get("transport"))
     if cfg["mode"] == "upwork_live":
         from mcp_servers.marketplace.adapters.upwork_live import UpworkLiveAdapter
         return UpworkLiveAdapter(user_id=credential or "")

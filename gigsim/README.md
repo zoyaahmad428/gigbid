@@ -6,12 +6,12 @@ a freelance marketplace: jobs appear over time, clients have histories and hidde
 Connects cost money, and the API sometimes rate-limits or fails.
 
 ```bash
-make gigsim                      # uvicorn gigsim.app:app --port 8100
-curl localhost:8100/health
-curl -H "Authorization: Bearer dev-token-ai-ml" "localhost:8100/v1/jobs?limit=5"
+make gigsim                      # uvicorn gigsim.app:app --port 8081
+curl localhost:8081/health
+curl -H "Authorization: Bearer dev-token-ai-ml" "localhost:8081/v1/jobs?limit=5"
 ```
 
-Interactive docs: `http://localhost:8100/docs`.
+Interactive docs: `http://localhost:8081/docs`.
 
 ## Accounts
 | Token (dev only) | Persona |

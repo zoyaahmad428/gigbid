@@ -1,6 +1,6 @@
 """GigSim: a marketplace simulator for GigBid.
 
-    uvicorn gigsim.app:app --port 8100
+    uvicorn gigsim.app:app --port 8081
 
 Public API under /v1 (bearer token per freelancer account), admin API under
 /admin (X-Admin-Token). Client behaviour is simulated in client_sim.py and
