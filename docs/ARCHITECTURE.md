@@ -4,14 +4,17 @@ GigBid is a set of agents in two LangGraph graphs. Every capability is an MCP to
 servers we wrote. Everything a client sees passes through a human approval step.
 
 ```
-Web app (React)  ──►  API (FastAPI)  ──►  Runtime (agent/runtime.py) ──► bid graph / conversation graph
-                                               │  checkpoints (Postgres or SQLite)
-                                               │  long-term memory store (style + outcomes)
-                                               ▼
-                      Toolbox (agent/mcp_client.py): per-agent allowlists, timeouts, retries, tracing
-                         │                    │                         │
-                  Portfolio MCP        Marketplace MCP            Workspace MCP
-                  (read-only)          (port: GigSim | Upwork)    (calendar + drafts)
+Web app (React) ──► API (FastAPI) ──queue──► Arq worker (Redis) ◄── schedules: scout, monitor
+                        │  app store: users, run index, run events (the live stream reads these)
+                        ▼                         ▼
+                   Runtime (agent/runtime.py) ──► bid graph / conversation graph
+                        │  checkpoints and long-term memory (Postgres; SQLite in local dev)
+                        │  trace store (SQLite) ──► Langfuse (optional)
+                        ▼
+                   Toolbox (agent/mcp_client.py): per-agent allowlists, timeouts, retries, tracing
+                      │                    │                         │
+               Portfolio MCP        Marketplace MCP            Workspace MCP
+               (read-only)          (port: GigSim | Upwork)    (calendar + drafts)
 ```
 
 Both graphs are rendered from code in `docs/images/bid_graph.mmd` and
@@ -58,7 +61,8 @@ they cost nothing. Models are used where judgement over text is needed. The R&D 
 ## Conversation graph (one thread per client message)
 
 `read` → `intent` → (`slots` if the client asked for an interview) → `draft_reply` → `compliance`
-→ `approval` (interrupt) → `send`, plus a tentative calendar hold for interviews.
+→ `approval` (interrupt) → `send`, plus a tentative calendar hold for interviews. A message that
+only acknowledges something ("thanks", "booked, talk then") ends at `intent` with "no reply needed".
 
 Scam signals in a conversation (moving off the platform, asking for free work) get a polite
 on-platform refusal drafted for approval. The client's text is wrapped as untrusted data, the same
@@ -69,7 +73,7 @@ as job posts.
 | | What | Where |
 |---|---|---|
 | State | What this job or conversation needs now: analyses, evidence, decision, price, drafts, critiques, approvals. Reducers are used where parallel branches write (`usage`, `steps`, `errors`, `drafts`). | `agent/state.py`, checkpointed per thread |
-| Execution trace | Every LLM and tool call: inputs (PII-masked), output summary, tokens, cost, latency | `agent/trace.py` (SQLite; Langfuse in step 6) |
+| Execution trace | Every LLM and tool call: inputs (PII-masked), output summary, tokens, cost, latency | `agent/trace.py` (SQLite; also sent to Langfuse when configured) |
 | Long-term memory | Only promoted knowledge: style rules from edits, outcome lessons per category | `agent/memory/` (LangGraph store) |
 
 Raw tool output never enters memory. The promotion rules are in
@@ -108,13 +112,55 @@ Reads (jobs, proposals, messages, Connects) go straight to the marketplace adapt
 own token. Anything that acts goes through a graph thread, and the API can only resume a thread's
 approval with the human's decision, validated as an `ApprovalDecision` before the graph sees it.
 
-Runs execute as background tasks; every event they yield is stored in the app database
-(`apps/api/store.py`). `GET /api/runs/{id}/stream` is server-sent events: it replays stored events,
+Each run is one operation (`start_bid`, `start_conversation`, `resume`, `retry`). It executes
+either as a background task in the API (local dev) or as a job for the Arq worker
+(`GIGBID_RUNNER=worker`: docker compose and deployment). Either way every event it yields is
+stored in the app database (`apps/api/store.py`). `GET /api/runs/{id}/stream` is server-sent events: it replays stored events,
 then follows new ones, so a refresh or a second tab rebuilds the same timeline. Pending approvals
 live in the checkpointer, so they survive an API restart; runs cut off by a restart are marked
 `interrupted` and can be retried from their last checkpoint. Three stores, three jobs: the
 checkpointer owns thread state, the trace store owns LLM and tool calls, and the app store owns
 users, sessions and the run index.
+
+## Worker and schedules
+
+`worker/` (Arq on Redis) runs the queued graph runs and two schedules. The **scout** looks for new
+jobs in the user's category every 30 minutes (only for users who turned auto-scout on) and starts
+at most two bid runs per tick. The **monitor** reads marketplace events every 5 minutes: a client
+message starts a reply draft, and a resolved proposal is counted in the outcome memory. Before
+this, nothing called `record_outcome`, so outcome lessons could never be learned. Everything the
+worker starts stops at the approval interrupt; only the API can resume one.
+
+Jobs are retried after a crash, so every run goes through `Runtime.execute`, which is safe to
+repeat. A thread that a dead worker left half-way continues from its last checkpoint instead of
+starting over. Any other operation runs only if the thread is still at the checkpoint the caller
+saw; otherwise an earlier attempt already did it. Job ids are derived from the thread, the
+operation and that checkpoint, and a Redis lock per thread stops two workers driving one thread.
+This was tested by stopping a worker after `pricing`: the restarted worker continued at `writer`,
+the analysis ran once, and after approval exactly one proposal was submitted.
+
+The first live run of the monitor found two agent bugs, both now fixed:
+- The Compliance Guard blocked a harmless reply as "Proposal sent without human approval". It was
+  judging a process rule, not the text. Prompt v4 makes process rules the system's job.
+- A reply was drafted to "Booked, talk then." There is now an `acknowledgement` intent that ends
+  the thread with "no reply needed".
+
+## Deployment and CI
+
+One Docker image serves every role (`infra/docker/`). `infra/docker-compose.yml` runs Postgres,
+Redis, GigSim, the API (which serves the built web app) and the worker. A demo host with a
+single port runs everything in one container (`start-all.sh`; Hugging Face Spaces, see
+`docs/RUNBOOK.md`). Sign-up can be closed and reviewer accounts seeded from secrets, and a
+per-user daily run cap protects the model budget.
+
+CI (`.github/workflows/ci.yml`) runs on every push:
+- lint and all Python tests, with the worker tests also on Postgres and a real Arq/Redis round trip;
+- the web app's lint, type check, build and browser tests;
+- a Docker build with a smoke test of the single container;
+- the **evaluation gate** (`evals/runners/ci_gate.py`). It checks retrieval quality of the
+  deployed variant, injection and scam rule recall and false positives, and claim verification on
+  held-out claims against `evals/baselines/ci_gate.json`. The build fails if a metric drops by
+  more than 0.02. It needs no API key; the LLM-dependent evaluations run separately.
 
 ## One marketplace port
 
