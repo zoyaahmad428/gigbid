@@ -1,9 +1,25 @@
-.PHONY: install api test lint eval data-download seed data-validate gigsim gigsim-test mcp-portfolio mcp-marketplace mcp-workspace mcp-test snapshots rag-eval verify-eval rag-suite graphs demo agent-test
+.PHONY: install api web-install web web-build web-test api-test test lint eval data-download seed data-validate gigsim gigsim-test mcp-portfolio mcp-marketplace mcp-workspace mcp-test snapshots rag-eval verify-eval rag-suite graphs demo agent-test
 install:
 	python -m pip install -e ".[dev]"
 
 api:
 	uvicorn apps.api.main:app --reload --port 8000
+
+# ---- Web app (apps/web): React + TypeScript + Vite
+web-install:
+	cd apps/web && npm ci
+
+web:          # dev server on :5173, proxies /api to :8000
+	cd apps/web && npx vite --port 5173
+
+web-build:    # FastAPI serves apps/web/dist when it exists
+	cd apps/web && npm run build
+
+web-test:     # Playwright, API mocked; needs `npx playwright install chromium` once
+	cd apps/web && npx playwright test
+
+api-test:
+	python -m pytest tests/integration/test_api.py -q
 
 test:
 	pytest -q

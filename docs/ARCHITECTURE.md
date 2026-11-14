@@ -95,6 +95,27 @@ results per (user, tool, key), and GigSim enforces keys too. So if the process d
 human's approval and the checkpoint after submitting, replaying the thread returns the first
 result. It never submits twice or spends Connects twice.
 
+Thread ids are per job, but the marketplace allows one proposal per job across all threads. So
+`load_job` checks the user's existing proposals first and skips a job they already applied to. If
+one appears between drafting and approval, `submit` stops with `needs_attention` and a plain
+reason, not a raw conflict error. (Found in the first UI run: a job from an earlier demo was
+drafted again and only failed after approval.)
+
+## API and web app
+
+`apps/api` (FastAPI) is the web app's only backend; `apps/web` (React + TypeScript) is the UI.
+Reads (jobs, proposals, messages, Connects) go straight to the marketplace adapter with the user's
+own token. Anything that acts goes through a graph thread, and the API can only resume a thread's
+approval with the human's decision, validated as an `ApprovalDecision` before the graph sees it.
+
+Runs execute as background tasks; every event they yield is stored in the app database
+(`apps/api/store.py`). `GET /api/runs/{id}/stream` is server-sent events: it replays stored events,
+then follows new ones, so a refresh or a second tab rebuilds the same timeline. Pending approvals
+live in the checkpointer, so they survive an API restart; runs cut off by a restart are marked
+`interrupted` and can be retried from their last checkpoint. Three stores, three jobs: the
+checkpointer owns thread state, the trace store owns LLM and tool calls, and the app store owns
+users, sessions and the run index.
+
 ## One marketplace port
 
 `agent/marketplace_port.py` defines the interface. `mcp_servers/marketplace/adapters/` holds the
