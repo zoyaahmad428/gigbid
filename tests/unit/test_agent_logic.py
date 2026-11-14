@@ -223,3 +223,46 @@ def test_eval_gate_fails_on_a_drop_and_respects_lower_is_better():
                                              "verification.true_claims_removed": 0.05}, base)}
     assert not any(bad.values())                              # a drop, or a rise where lower is better
     assert compare({"retrieval.mrr": 0.99}, base)[0][3]       # improvements pass
+
+
+def test_rate_limit_wait_is_read_from_the_provider_message():
+    from agent.llm import rate_limit_wait
+    assert rate_limit_wait(Exception("Rate limit reached ... Please try again in 7m12.5s. Need more tokens?")) == 432.5
+    assert rate_limit_wait(Exception("Please try again in 1h2m3s")) == 3723
+    assert rate_limit_wait(Exception("Please try again in 577ms.")) == 0.577
+    assert rate_limit_wait(Exception("server error")) is None
+
+
+def test_provider_json_generation_failure_is_retried_not_dead_lettered(monkeypatch):
+    import httpx
+    from openai import BadRequestError
+    from pydantic import BaseModel
+
+    from agent import llm
+
+    class Out(BaseModel):
+        ok: bool
+
+    calls = []
+
+    def fake_chat(node, system, user, *, model=None, **kw):
+        calls.append(model)
+        if len(calls) == 1:
+            req = httpx.Request("POST", "https://api.groq.com/openai/v1/chat/completions")
+            raise BadRequestError("Error code: 400 - Failed to generate JSON. See 'failed_generation'",
+                                  response=httpx.Response(400, request=req), body=None)
+        return '{"ok": true}', {"tokens_in": 1, "tokens_out": 1, "cost_usd": 0.0}
+
+    monkeypatch.setattr(llm, "chat", fake_chat)
+    monkeypatch.setattr(llm, "render", lambda *a, **k: ("system", "user"))
+    out, usage = llm.structured("analyst", Out, {})
+    assert out.ok and len(calls) == 2 and usage["calls"] == 1
+
+
+def test_rate_limit_pauses_of_parallel_nodes_count_once():
+    from agent import llm
+    llm.RATE_WAITS.clear()
+    llm.RATE_WAITS.extend([(10.0, 20.0), (15.0, 25.0), (40.0, 50.0), (90.0, 120.0)])
+    assert llm.rate_waited(0.0, 100.0) == 35.0       # 10-25 once, 40-50, and 90-100 clipped to the window
+    assert llm.rate_waited(30.0, 35.0) == 0.0
+    llm.RATE_WAITS.clear()

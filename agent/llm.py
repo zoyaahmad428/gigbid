@@ -9,13 +9,14 @@ fallback model. Every call is written to the trace store with tokens and cost.
 from __future__ import annotations
 
 import json
+from collections import deque
 import os
 import re
 import time
 from functools import lru_cache
 from typing import TypeVar
 
-from openai import APIConnectionError, APITimeoutError, OpenAI, RateLimitError
+from openai import APIConnectionError, APITimeoutError, BadRequestError, OpenAI, RateLimitError
 from pydantic import BaseModel, ValidationError
 
 from agent.prompts import render
@@ -61,6 +62,61 @@ def _extract_json(text: str) -> dict:
         return json.loads(m.group(0))
 
 
+_WAIT_RX = re.compile(r"try again in ((?:[\d.]+(?:ms|h|m|s))+)", re.I)
+_UNIT = {"h": 3600.0, "m": 60.0, "s": 1.0, "ms": 0.001}
+
+
+def rate_limit_wait(err: Exception) -> float | None:
+    """Seconds the provider asks us to wait, from a 429 message ("Please try again in 7m12.5s", "577ms")."""
+    m = _WAIT_RX.search(str(err))
+    if not m:
+        return None
+    return round(sum(float(n) * _UNIT[u.lower()] for n, u in re.findall(r"([\d.]+)(ms|h|m|s)", m.group(1), re.I)), 3)
+
+
+RATE_WAITS: deque[tuple[float, float]] = deque(maxlen=1000)   # (start, end) of recent rate-limit pauses
+
+
+def rate_waited(t0: float, t1: float) -> float:
+    """Seconds between t0 and t1 spent paused on rate limits (overlapping parallel waits count once)."""
+    spans = sorted((max(a, t0), min(b, t1)) for a, b in RATE_WAITS if b > t0 and a < t1)
+    total, end = 0.0, t0
+    for a, b in spans:
+        if b > end:
+            total += b - max(a, end)
+            end = b
+    return round(total, 2)
+
+
+def note_rate_wait(seconds: float) -> None:
+    """Sleep out a rate limit and record the pause (evaluations report latency without it)."""
+    start = time.perf_counter()
+    time.sleep(seconds)
+    RATE_WAITS.append((start, time.perf_counter()))
+
+
+def create_with_wait(**kwargs):
+    """chat.completions.create that waits out rate limits for up to GIGBID_RATE_WAIT seconds in total.
+
+    The default (60 s) covers the per-minute limit in production. Evaluations set it to hours, so a
+    run that hits the free tier's daily token limit pauses instead of failing or falling back to
+    another model (which would change what is being measured)."""
+    budget = float(os.environ.get("GIGBID_RATE_WAIT", "60"))
+    while True:
+        try:
+            return client().chat.completions.create(**kwargs)
+        except RateLimitError as e:
+            wait = rate_limit_wait(e)
+            if wait is None or wait + 1 > budget:
+                raise
+            if wait > 30:
+                m = re.search(r"on (tokens|requests) per \w+.*?Limit \d+, Used \d+, Requested \d+", str(e))
+                print(f"[rate limit] {kwargs.get('model')}: waiting {wait / 60:.1f} min "
+                      f"({m.group(0) if m else str(e)[:200]})", flush=True)
+            note_rate_wait(wait + 1)
+            budget -= wait + 1
+
+
 def chat(node: str, system: str, user: str, *, model: str | None = None, json_mode: bool = True,
          temperature: float | None = None) -> tuple[str, dict]:
     """One completion. Returns (text, usage). Traced."""
@@ -69,7 +125,7 @@ def chat(node: str, system: str, user: str, *, model: str | None = None, json_mo
     t = temps.get(node, temps["default"]) if temperature is None else temperature
     start = time.perf_counter()
     try:
-        r = client().chat.completions.create(
+        r = create_with_wait(
             model=model, temperature=t, messages=[{"role": "system", "content": system},
                                                   {"role": "user", "content": user}],
             **({"response_format": {"type": "json_object"}} if json_mode else {}))
@@ -91,7 +147,7 @@ def structured(node: str, out_model: type[T], variables: dict, *, prompt: str | 
     """Prompt -> validated Pydantic object. Returns (object, usage summed over attempts)."""
     system, user = render(prompt or node, variables, schema=out_model.model_json_schema())
     models = [model_for(node)]
-    if node in CHEAP_NODES and profile().get("fallback"):
+    if node in CHEAP_NODES and profile().get("fallback") and os.environ.get("GIGBID_NO_FALLBACK") != "1":
         models.append(profile()["fallback"])
     total = {"tokens_in": 0, "tokens_out": 0, "cost_usd": 0.0, "calls": 0}
     last_err = ""
@@ -100,6 +156,15 @@ def structured(node: str, out_model: type[T], variables: dict, *, prompt: str | 
         for _attempt in range(2):
             try:
                 text, u = chat(node, system, msg, model=model)
+            except BadRequestError as e:
+                if "failed to generate json" not in str(e).lower():
+                    raise
+                # Groq's JSON mode sometimes fails to sample valid JSON (HTTP 400 "Failed to generate
+                # JSON"). It is the same failure as an invalid reply: retry, then the fallback model.
+                # (Found in the step-7 evaluation: it dead-lettered a job at the Analyst.)
+                last_err = "provider failed to generate JSON"
+                msg = render("json_retry", {"user": user})[1]
+                continue
             except (APIConnectionError, APITimeoutError, RateLimitError) as e:
                 last_err = f"{type(e).__name__}: {e}"
                 break                                   # try the fallback model

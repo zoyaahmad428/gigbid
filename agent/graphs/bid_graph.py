@@ -67,7 +67,8 @@ def after_verifier(state: dict) -> str:
     return "compliance" if state.get("after_edit") else "critic"
 
 
-def build_bid_graph(checkpointer=None, store=None):
+def build_bid_graph(checkpointer=None, store=None, interrupt_before: list[str] | None = None):
+    """interrupt_before: evaluations stop a run before a node (e.g. the writer) to measure one stage."""
     g = StateGraph(BidState)
     for name, fn in [("load_job", load_job), ("analyst", analyst), ("risk_assessor", risk_assessor),
                      ("fit_matcher", fit_matcher), ("decision", decide), ("pricing", pricing), ("writer", writer),
@@ -87,4 +88,4 @@ def build_bid_graph(checkpointer=None, store=None):
     g.add_conditional_edges("approval_gate", lambda s: {"submit": "submit", "verifier": "verifier"}.get(
         route_after_gate(s), END), ["submit", "verifier", END])
     g.add_edge("submit", END)
-    return g.compile(checkpointer=checkpointer, store=store)
+    return g.compile(checkpointer=checkpointer, store=store, interrupt_before=interrupt_before)
