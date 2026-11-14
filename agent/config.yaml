@@ -1,30 +1,113 @@
 marketplace:
   mode: gigsim                    # gigsim | upwork_live  (override with MARKETPLACE_MODE)
-  gigsim_url: http://localhost:8100
+  gigsim_url: http://localhost:8081
   max_requests_per_minute: 40     # per user, below GigSim's 60/min limit
   burst: 10
   timeout_seconds: 10
   max_retries: 3                  # for 429/5xx/timeouts, with exponential backoff
 
+mcp:
+  mode: inprocess                 # inprocess | http   (override with MCP_MODE)
+  urls:                           # used when mode is http (override with MCP_<SERVER>_URL)
+    portfolio: http://localhost:8201/mcp
+    marketplace: http://localhost:8202/mcp
+    workspace: http://localhost:8203/mcp
+  timeout_seconds: 30
+  retries: 2
+
 models:
-  profile: open
-  nodes:
-    scout: qwen3-4b
-    analyst: qwen3-4b
-    risk_assessor: qwen3-4b
-    fit_matcher: qwen3-4b
-    pricing: qwen3-4b
-    writer: configure-your-model
-    critic: configure-your-model
-    client_liaison: configure-your-model
-  embeddings: nomic-embed-text
-  reranker: bge-reranker-v2-m3
+  profile: open                   # open (required) | paid (optional); override with MODEL_PROFILE
+  providers:
+    groq:
+      base_url: https://api.groq.com/openai/v1
+      api_key_env: OPENAI_API_KEY # the Groq key lives here in .env (OpenAI-compatible API)
+      # USD per 1M tokens (input, output), Groq list prices; check before reporting costs
+      prices:
+        openai/gpt-oss-20b: [0.075, 0.30]
+        openai/gpt-oss-120b: [0.15, 0.60]
+        qwen/qwen3.8-27b: [0.29, 0.59]
+        meta-llama/llama-prompt-guard-2-86m: [0.04, 0.04]
+  profiles:
+    open:                         # open-weight models on a hosted open-model provider
+      provider: groq
+      nodes:
+        analyst: openai/gpt-oss-20b
+        risk_assessor: openai/gpt-oss-20b
+        compliance: openai/gpt-oss-20b
+        liaison_intent: openai/gpt-oss-20b
+        writer: openai/gpt-oss-120b
+        critic: openai/gpt-oss-120b
+        client_liaison: openai/gpt-oss-120b
+      fallback: qwen/qwen3.8-27b  # used when a cheap node's model fails twice
+      injection_classifier: meta-llama/llama-prompt-guard-2-86m
+    open_qwen:                    # second open configuration, compared on the dev set
+      provider: groq
+      nodes:
+        analyst: openai/gpt-oss-20b
+        risk_assessor: openai/gpt-oss-20b
+        compliance: openai/gpt-oss-20b
+        liaison_intent: openai/gpt-oss-20b
+        writer: qwen/qwen3.8-27b
+        critic: qwen/qwen3.8-27b
+        client_liaison: qwen/qwen3.8-27b
+      fallback: openai/gpt-oss-20b
+      injection_classifier: meta-llama/llama-prompt-guard-2-86m
+  temperature:
+    default: 0.2
+    writer: 0.5
+  request_timeout_seconds: 45
+  embeddings: BAAI/bge-small-en-v1.5        # chosen by evals/runners/rag_eval.py; alt: nomic-ai/nomic-embed-text-v1.5-Q
+  reranker: jinaai/jina-reranker-v1-turbo-en # 82 pairs/s on CPU; bge-reranker-v2-m3-int8 is 10 pairs/s
+
+rag:
+  variant: combined                          # deployed; see rag/variants/README.md (results) 
+  chunk_words: 120
+  chunk_overlap: 30
+  candidates: 30                             # docs kept per query before reranking/fusion
+  rerank_top: 20
+  max_requirements: 5
+  rrf_k: 60
+  corrective_threshold: 0.35                 # V8: below this best-evidence grade, re-query
+  corrective_refuse: 0.2                     # V8: still below this after re-query, claim nothing
+  verify:                                    # claim verification thresholds (cross-encoder grade)
+    supported: 0.4
+    partly: 0.1  
 
 budgets:
-  max_graph_steps: 30
-  max_revisions: 2
-  max_tokens_per_job: 12000
+  max_graph_steps: 30             # per thread; exceeding moves the thread to "needs_attention"
+  max_revisions: 2                # Critic can send a draft back at most this many times
+  max_tokens_per_job: 40000
+  max_tokens_per_conversation_turn: 15000
 
 thresholds:
-  minimum_fit_score: 0.60
-  maximum_risk_score: 0.70
+  # Fit thresholds are calibrated, not hand-set: evals/runners/fit_calibration.py (tune half of the
+  # dev sets; held-out half: bid recall 0.95, no-fit rejected 0.76). The first hand-set values
+  # (bid 0.55, proven 0.5, partial 0.25) bid on 8% of the jobs that should be bid.
+  minimum_fit_score: 0.30         # below: watch or skip
+  watch_fit_score: 0.20           # between watch and minimum: watch
+  fit_requirement_weight: 0.45    # fit = w * requirement coverage + (1 - w) * skill coverage
+  maximum_risk_score: 0.70        # above: skip
+  injection_classifier_threshold: 0.8
+  evidence_proven: 0.40           # Fit Matcher: cross-encoder grade for a "proven" requirement
+  evidence_partial: 0.08          # ... and for "partial"; below is "missing"
+  duplicate_jaccard: 0.8          # Scout: near-duplicate if word-shingle Jaccard >= this
+  proposal_max_words: 260
+  proposal_min_words: 80
+
+pricing:
+  hourly_floor_usd: null          # null = persona profile rate
+  fixed_floor_usd: null           # null = persona profile minimum
+  market_percentile_target: p50
+  connects_reserve: 10            # never spend below this balance without a warning
+  skip_if_hourly_max_below: 0.6   # skip when the client's hourly maximum < this x your rate
+  skip_if_fixed_max_below_minimum: true   # skip when a fixed budget's maximum < your minimum
+
+autonomy:
+  auto_skip_low_fit: true         # may auto-skip clear low-fit / scam jobs; never auto-sends
+
+memory:
+  style_promote_min_edits: 3      # a style rule needs this many supporting edits...
+  style_window: 10                # ...within the user's last N edits
+  style_max_contradictions: 0
+  outcome_min_proposals: 5        # outcome lesson needs this many resolved proposals in the category
+  outcome_min_gap: 0.15           # and at least this difference in reply rate between styles
