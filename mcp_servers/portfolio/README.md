@@ -23,7 +23,41 @@ client reviews, and past proposals with their outcomes. It's built with the offi
 The prompts tell the model to cite evidence ids, and to say so when there is no evidence rather than
 invent experience.
 
-## Run it
+## Install with Docker (no clone needed)
+
+The image is published from this repository's CI (`ghcr.io/zoyaahmad428/gigbid`). It includes the
+three sample portfolios and the retrieval models.
+
+```bash
+docker run -i --rm -e PORTFOLIO_PERSONA=ai_ml ghcr.io/zoyaahmad428/gigbid:latest \
+  python -m mcp_servers.portfolio.server
+```
+
+Claude Desktop (`claude_desktop_config.json`):
+
+```json
+{
+  "mcpServers": {
+    "gigbid-portfolio": {
+      "command": "docker",
+      "args": ["run", "-i", "--rm", "-e", "PORTFOLIO_PERSONA=ai_ml",
+               "ghcr.io/zoyaahmad428/gigbid:latest", "python", "-m", "mcp_servers.portfolio.server"]
+    }
+  }
+}
+```
+
+Your own portfolio (layout under "Use your own portfolio" below), mounted read-only:
+
+```bash
+docker run -i --rm -v "$PWD/my_portfolio:/app/data/personas/me:ro" -e PORTFOLIO_PERSONA=me \
+  ghcr.io/zoyaahmad428/gigbid:latest python -m mcp_servers.portfolio.server
+```
+
+Over HTTP with bearer auth: add `-p 8201:8201 -e PORTFOLIO_USERS="secret-token=me:ai_ml"`, and pass
+`--http --host 0.0.0.0 --port 8201` to the server.
+
+## Run it from a clone
 
 From the GigBid repository root:
 

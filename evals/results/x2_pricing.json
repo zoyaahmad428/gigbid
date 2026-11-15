@@ -1,0 +1,116 @@
+{
+ "generated_at": "2026-11-15T03:10:36Z",
+ "sources": [
+  "prop_combined",
+  "prop_v0_naive",
+  "c_graph"
+ ],
+ "premium": 0.25,
+ "sim_days": 14,
+ "pairs": 12,
+ "A_shipped_price": {
+  "proposals": 12,
+  "submitted": 12,
+  "rejected_at_submission": 0,
+  "reply_rate": 0.0833,
+  "interview_rate": 0.0833,
+  "hire_rate": 0.0
+ },
+ "B_premium_price": {
+  "proposals": 12,
+  "submitted": 12,
+  "rejected_at_submission": 0,
+  "reply_rate": 0.0,
+  "interview_rate": 0.0,
+  "hire_rate": 0.0
+ },
+ "discordant_A_only": 1,
+ "discordant_B_only": 0,
+ "mcnemar_exact_p": 1.0,
+ "per_job": [
+  {
+   "job_id": "job_cea72b83bb",
+   "A": "lost",
+   "B": "lost",
+   "price_A": 55.0,
+   "price_B": 68.75
+  },
+  {
+   "job_id": "job_3fbc274478",
+   "A": "lost",
+   "B": "lost",
+   "price_A": 4750.0,
+   "price_B": 5937.5
+  },
+  {
+   "job_id": "job_6a2b16dc76",
+   "A": "lost",
+   "B": "lost",
+   "price_A": 1900.0,
+   "price_B": 2375.0
+  },
+  {
+   "job_id": "job_5ab5aa4f49",
+   "A": "lost",
+   "B": "lost",
+   "price_A": 55.0,
+   "price_B": 68.75
+  },
+  {
+   "job_id": "job_978751d7ad",
+   "A": "lost",
+   "B": "lost",
+   "price_A": 40.0,
+   "price_B": 50.0
+  },
+  {
+   "job_id": "job_f304c952a6",
+   "A": "interview",
+   "B": "lost",
+   "price_A": 40.0,
+   "price_B": 50.0
+  },
+  {
+   "job_id": "job_be9ecfdf01",
+   "A": "lost",
+   "B": "lost",
+   "price_A": 40.0,
+   "price_B": 50.0
+  },
+  {
+   "job_id": "job_5ebdb1fca3",
+   "A": "lost",
+   "B": "lost",
+   "price_A": 50.0,
+   "price_B": 62.5
+  },
+  {
+   "job_id": "job_93c6c3e0e8",
+   "A": "lost",
+   "B": "lost",
+   "price_A": 50.0,
+   "price_B": 62.5
+  },
+  {
+   "job_id": "job_97063ad0c9",
+   "A": "lost",
+   "B": "lost",
+   "price_A": 50.0,
+   "price_B": 62.5
+  },
+  {
+   "job_id": "job_76eb207e5e",
+   "A": "lost",
+   "B": "lost",
+   "price_A": 50.0,
+   "price_B": 62.5
+  },
+  {
+   "job_id": "job_aadc10c59d",
+   "A": "lost",
+   "B": "lost",
+   "price_A": 40.0,
+   "price_B": 50.0
+  }
+ ]
+}

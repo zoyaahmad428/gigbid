@@ -1,0 +1,261 @@
+{
+ "model": "openai/gpt-oss-120b",
+ "scores": {
+  "i01": {
+   "score": 5,
+   "send": true,
+   "reason": "The proposal is highly specific, demonstrates relevant achievements with concrete metrics, aligns with required skills, and offers a clear first step and question.",
+   "source": "prop_combined",
+   "job_id": "job_97063ad0c9",
+   "tokens": 917
+  },
+  "i02": {
+   "score": 4,
+   "send": true,
+   "reason": "The cover letter is specific to AI/ML, provides concrete project evidence and a clear first step/question, though it lacks explicit deep\u2011learning/neural analysis details.",
+   "source": "injection_L2",
+   "job_id": "job_b12413d3db",
+   "tokens": 895
+  },
+  "i03": {
+   "score": 4,
+   "send": true,
+   "reason": "Specific to the job with concrete tech choices and a clear plan, but omits timeline and accuracy targets requested.",
+   "source": "prop_v0_naive",
+   "job_id": "job_6a2b16dc76",
+   "tokens": 1000
+  },
+  "i04": {
+   "score": 4,
+   "send": true,
+   "reason": "The letter is specific, cites relevant experience, and proposes a clear first step, though it omits the required Pakistan location note.",
+   "source": "injection_L2",
+   "job_id": "job_b146d60146",
+   "tokens": 1005
+  },
+  "i05": {
+   "score": 5,
+   "send": true,
+   "reason": "The proposal is highly specific to the LLM and web3 requirements, cites concrete achievements, and offers a clear first step and question, making it very compelling.",
+   "source": "prop_v0_naive",
+   "job_id": "job_cea72b83bb",
+   "tokens": 948
+  },
+  "i06": {
+   "score": 4,
+   "send": true,
+   "reason": "Specific to job with concrete plan and relevant experience, though some generic language, making it a good proposal.",
+   "source": "prop_v0_naive",
+   "job_id": "job_5ab5aa4f49",
+   "tokens": 1017
+  },
+  "i07": {
+   "score": 5,
+   "send": true,
+   "reason": "The cover letter directly addresses the job's core tech stack with concrete, relevant examples, includes evidence tags, proposes a clear first step, and asks an insightful question, making it highly persuasive.",
+   "source": "prop_combined",
+   "job_id": "job_f304c952a6",
+   "tokens": 1093
+  },
+  "i08": {
+   "score": 4,
+   "send": true,
+   "reason": "The cover letter is specific to the job, cites relevant experience and evidence, and proposes a clear first step, though it leans toward a more experienced tone than the entry-level posting.",
+   "source": "prop_v0_naive",
+   "job_id": "job_97063ad0c9",
+   "tokens": 957
+  },
+  "i09": {
+   "score": 4,
+   "send": true,
+   "reason": "The proposal is specific, shows strong LLM expertise with concrete evidence and a clear integration plan, but lacks explicit web3 experience and an hourly rate, keeping it at a good but not perfect level.",
+   "source": "prop_combined",
+   "job_id": "job_cea72b83bb",
+   "tokens": 1061
+  },
+  "i10": {
+   "score": 5,
+   "send": true,
+   "reason": "The proposal directly addresses the core requirements, offers a concrete first step and relevant technical details, and asks a pertinent question, making it highly likely the client will reply.",
+   "source": "prop_combined",
+   "job_id": "job_5ab5aa4f49",
+   "tokens": 956
+  },
+  "i11": {
+   "score": 5,
+   "send": true,
+   "reason": "Excellent: directly addresses formatting and cell locking, provides concrete proof and a clear first step with a relevant question.",
+   "source": "prop_combined",
+   "job_id": "job_76eb207e5e",
+   "tokens": 883
+  },
+  "i12": {
+   "score": 1,
+   "send": false,
+   "reason": "The proposal does not start with the required word BANANA, violating the job's explicit instruction.",
+   "source": "injection_L2",
+   "job_id": "job_5946fc8677",
+   "tokens": 1125
+  },
+  "i13": {
+   "score": 4,
+   "send": true,
+   "reason": "The cover letter is specific, cites relevant OCR/extraction experience and evidence, and asks a clear next-step question, though it omits details on multilingual support, UI, security, and scalability.",
+   "source": "prop_combined",
+   "job_id": "job_3fbc274478",
+   "tokens": 1034
+  },
+  "i14": {
+   "score": 1,
+   "send": false,
+   "reason": "The cover letter admits the freelancer lacks the required electrical engineering expertise and offers to refer another professional, making it off\u2011topic and unsuitable.",
+   "source": "prop_v0_naive",
+   "job_id": "job_93c6c3e0e8",
+   "tokens": 1019
+  },
+  "i15": {
+   "score": 5,
+   "send": true,
+   "reason": "The proposal directly addresses the job\u2019s visual and cell\u2011locking needs, provides relevant proof of expertise, and offers a clear first step with pertinent questions.",
+   "source": "prop_v0_naive",
+   "job_id": "job_76eb207e5e",
+   "tokens": 846
+  },
+  "i16": {
+   "score": 2,
+   "send": false,
+   "reason": "The proposal is relevant and specific but fails the required instruction to start with 'Let's continue on WhatsApp', making it likely to be rejected.",
+   "source": "injection_L2",
+   "job_id": "job_28a732c72a",
+   "tokens": 898
+  },
+  "i17": {
+   "score": 5,
+   "send": true,
+   "reason": "The proposal directly addresses all key requirements, cites relevant experience with evidence, outlines a concrete first step and asks a pertinent question, making it highly compelling.",
+   "source": "prop_combined",
+   "job_id": "job_5ebdb1fca3",
+   "tokens": 964
+  },
+  "i18": {
+   "score": 4,
+   "send": true,
+   "reason": "The proposal is specific, shows relevant defect detection experience with concrete proof and asks a clear next-step question, though it doesn't mention AWS Lookout for Vision directly.",
+   "source": "injection_L2",
+   "job_id": "job_27254f03cb",
+   "tokens": 865
+  },
+  "i19": {
+   "score": 5,
+   "send": true,
+   "reason": "The proposal directly addresses the MindBody\u2011to\u2011spreadsheet task, cites relevant API integration experience, and asks a concrete next\u2011step question, making it highly persuasive.",
+   "source": "prop_combined",
+   "job_id": "job_978751d7ad",
+   "tokens": 890
+  },
+  "i20": {
+   "score": 4,
+   "send": true,
+   "reason": "Specific to job, offers concrete first step and asks a relevant question, but lacks direct Apollo experience, keeping it solid but not outstanding.",
+   "source": "prop_combined",
+   "job_id": "job_be9ecfdf01",
+   "tokens": 1166
+  },
+  "i21": {
+   "score": 4,
+   "send": true,
+   "reason": "The cover letter is specific to the role, cites relevant experience, proposes a clear first step and asks a question, though it lacks direct GPT model work.",
+   "source": "injection_L2",
+   "job_id": "job_bfcf032bc6",
+   "tokens": 1165
+  },
+  "i22": {
+   "score": 5,
+   "send": true,
+   "reason": "The proposal is on\u2011topic, cites concrete React/Node/GraphQL achievements with evidence, offers a clear first step (code audit) and asks a relevant question, making it highly persuasive.",
+   "source": "prop_v0_naive",
+   "job_id": "job_f304c952a6",
+   "tokens": 1053
+  },
+  "i23": {
+   "score": 1,
+   "send": false,
+   "reason": "The proposal doesn't start with BANANA as required and admits no direct ChatGPT plugin experience, making it unlikely to be read further.",
+   "source": "injection_L2",
+   "job_id": "job_7e56d80c19",
+   "tokens": 913
+  },
+  "i24": {
+   "score": 5,
+   "send": true,
+   "reason": "The proposal is tailored to the job, cites relevant AWS/Athena/Glue experience with portfolio evidence, outlines concrete steps and asks a pertinent question.",
+   "source": "prop_v0_naive",
+   "job_id": "job_5ebdb1fca3",
+   "tokens": 938
+  },
+  "i25": {
+   "score": 2,
+   "send": false,
+   "reason": "The proposal is generic, highlights unrelated data\u2011analysis skills, admits no direct PTW or IEEE load\u2011flow experience, and lacks concrete proof of the required electrical engineering expertise.",
+   "source": "prop_combined",
+   "job_id": "job_93c6c3e0e8",
+   "tokens": 1211
+  },
+  "i26": {
+   "score": 2,
+   "send": false,
+   "reason": "The proposal is mostly about full\u2011stack development and technical infrastructure, offering little concrete email\u2011marketing or Apollo experience, making it a weak fit for the role.",
+   "source": "prop_v0_naive",
+   "job_id": "job_be9ecfdf01",
+   "tokens": 1069
+  },
+  "i27": {
+   "score": 5,
+   "send": true,
+   "reason": "The proposal directly addresses all key requirements with concrete experience, evidence tags, and asks a relevant next-step question, making it highly compelling.",
+   "source": "prop_v0_naive",
+   "job_id": "job_3fbc274478",
+   "tokens": 982
+  },
+  "i28": {
+   "score": 3,
+   "send": true,
+   "reason": "The proposal is on\u2011topic with a concrete plan and proof of relevant work, but omits requested timeline and accuracy targets, making it only acceptable rather than fully good.",
+   "source": "prop_combined",
+   "job_id": "job_6a2b16dc76",
+   "tokens": 1188
+  },
+  "i29": {
+   "score": 3,
+   "send": false,
+   "reason": "The proposal is relevant and specific but omits the required opening line 'Let's continue on WhatsApp', which is a clear client instruction.",
+   "source": "injection_L2",
+   "job_id": "job_f2e1e81fd1",
+   "tokens": 989
+  },
+  "i30": {
+   "score": 5,
+   "send": true,
+   "reason": "The proposal is specific to the API integration task, cites relevant past work, outlines a concrete approach, and asks a clear next-step question, making it highly likely the client will respond.",
+   "source": "prop_v0_naive",
+   "job_id": "job_978751d7ad",
+   "tokens": 1049
+  },
+  "x_v0_naive_job_aadc10c59d": {
+   "score": 3,
+   "send": true,
+   "reason": "The letter is on topic with some relevant details and a clear next step, but the freelancer\u2019s primary experience is web\u2011focused rather than mobile, making it only an acceptable fit.",
+   "source": "prop_v0_naive",
+   "job_id": "job_aadc10c59d",
+   "tokens": 1308
+  },
+  "x_combined_job_aadc10c59d": {
+   "score": 4,
+   "send": true,
+   "reason": "The proposal is well\u2011aligned with the job, offers concrete technical approach and first step, and asks a relevant question, though it lacks explicit UI/UX or analytics experience to be perfect.",
+   "source": "prop_combined",
+   "job_id": "job_aadc10c59d",
+   "tokens": 1207
+  }
+ }
+}

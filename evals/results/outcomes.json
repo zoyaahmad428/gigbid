@@ -1,0 +1,22 @@
+{
+ "prop_v0_naive": {
+  "proposals": 12,
+  "submitted": 12,
+  "rejected_at_submission": 0,
+  "reply_rate": 0.1667,
+  "interview_rate": 0.0,
+  "hire_rate": 0.0,
+  "sim_days": 14,
+  "generated_at": "2026-11-14T16:17:33Z"
+ },
+ "prop_combined": {
+  "proposals": 12,
+  "submitted": 12,
+  "rejected_at_submission": 0,
+  "reply_rate": 0.0833,
+  "interview_rate": 0.0833,
+  "hire_rate": 0.0,
+  "sim_days": 14,
+  "generated_at": "2026-11-14T16:17:35Z"
+ }
+}

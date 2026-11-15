@@ -1,0 +1,21 @@
+/* Print style for docs/REPORT.md -> docs/REPORT.pdf (docs/build/build_report.sh) */
+:root { --ink: #1d1d1f; --muted: #5f6368; --rule: #d9d9de; --accent: #3b3b98; }
+html { font-size: 9.5pt; }
+body { font-family: "Source Serif 4", "Georgia", serif; color: var(--ink); line-height: 1.36; max-width: none; margin: 0; }
+header#title-block-header { margin-bottom: 1.2em; border-bottom: 2px solid var(--ink); padding-bottom: .6em; }
+h1.title { font-size: 20pt; margin: 0; }
+p.subtitle { font-size: 11pt; margin: .2em 0 0; color: var(--muted); }
+p.date { font-size: 9pt; color: var(--muted); margin: .2em 0 0; }
+h1, h2, h3 { font-family: "Inter", "Helvetica Neue", Arial, sans-serif; color: var(--ink); break-after: avoid; }
+h1 { font-size: 13pt; margin: 1.3em 0 .4em; border-bottom: 1px solid var(--rule); padding-bottom: .15em; }
+h2 { font-size: 11pt; margin: 1em 0 .3em; }
+p, li { orphans: 3; widows: 3; }
+ul, ol { padding-left: 1.3em; margin: .3em 0 .6em; }
+code { font-family: "JetBrains Mono", Consolas, monospace; font-size: 8.4pt; background: #f4f4f6; padding: 0 .2em; border-radius: 2px; }
+table { border-collapse: collapse; width: 100%; margin: .5em 0 .9em; font-size: 8pt; break-inside: avoid; }
+th, td { border-bottom: 1px solid var(--rule); padding: .25em .4em; text-align: left; vertical-align: top; }
+th { border-bottom: 1.5px solid var(--ink); font-family: "Inter", Arial, sans-serif; }
+figure { margin: .6em auto; text-align: center; break-inside: avoid; }
+figure img { max-height: 92mm; }
+figcaption { font-size: 8.5pt; color: var(--muted); }
+strong { font-weight: 650; }

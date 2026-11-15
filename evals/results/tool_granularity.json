@@ -1,0 +1,74 @@
+{
+ "generated_at": "2026-11-15T03:18:39Z",
+ "sets": {
+  "fine": {
+   "n_tasks": 31,
+   "model": "openai/gpt-oss-120b",
+   "tool_selection_accuracy": 1.0,
+   "argument_accuracy": 0.8333,
+   "fully_correct_calls": 0.9355,
+   "tokens_per_task": 2115.0,
+   "cost_per_task_usd": 0.000342,
+   "by_category": {
+    "account": 1.0,
+    "calendar": 1.0,
+    "client": 1.0,
+    "jobs": 1.0,
+    "messages": 1.0,
+    "pipeline": 1.0,
+    "portfolio": 1.0,
+    "pricing": 1.0,
+    "writes": 1.0
+   },
+   "confusions": []
+  },
+  "coarse": {
+   "n_tasks": 31,
+   "model": "openai/gpt-oss-120b",
+   "tool_selection_accuracy": 0.8387,
+   "argument_accuracy": 0.619,
+   "fully_correct_calls": 0.7097,
+   "tokens_per_task": 588.0,
+   "cost_per_task_usd": 0.000118,
+   "by_category": {
+    "account": 1.0,
+    "calendar": 0.5,
+    "client": 1.0,
+    "jobs": 1.0,
+    "messages": 0.667,
+    "pipeline": 1.0,
+    "portfolio": 1.0,
+    "pricing": 0.5,
+    "writes": 0.75
+   },
+   "confusions": [
+    "create_tentative_hold -> INVALID:create_tentative_hold",
+    "get_free_slots -> INVALID:get_free_slots",
+    "get_market_stats -> search_jobs",
+    "send_message -> INVALID:send_message",
+    "submit_proposal -> list_proposals"
+   ]
+  },
+  "best": {
+   "n_tasks": 31,
+   "model": "openai/gpt-oss-120b",
+   "tool_selection_accuracy": 1.0,
+   "argument_accuracy": 0.8333,
+   "fully_correct_calls": 0.9355,
+   "tokens_per_task": 2209.2,
+   "cost_per_task_usd": 0.000355,
+   "by_category": {
+    "account": 1.0,
+    "calendar": 1.0,
+    "client": 1.0,
+    "jobs": 1.0,
+    "messages": 1.0,
+    "pipeline": 1.0,
+    "portfolio": 1.0,
+    "pricing": 1.0,
+    "writes": 1.0
+   },
+   "confusions": []
+  }
+ }
+}

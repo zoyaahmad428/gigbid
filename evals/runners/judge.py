@@ -4,19 +4,22 @@
     python -m evals.runners.label                    # YOU label them in the terminal (about 30 minutes)
     python -m evals.runners.judge --score            # the judge scores the same items (and all B drafts)
     python -m evals.runners.judge --kappa            # agreement: Cohen's kappa, judge vs you
+    python -m evals.runners.judge --score --prompt judge_v2   # re-score with the v2 rubric (judge_scores_v2.json)
 
 Items: the verified drafts of R&D question B (both retrieval arms), topped up with drafts from the
 injection study's shipped-prompt arm, 30 in all, shuffled, with the arm hidden from the labeller.
 The rubric is agent/prompts/judge.md (1-5 and "would send as is"). The judge model defaults to
 gpt-oss-120b: another model family than the Qwen writer, so it does not grade its own style.
 
-Writes evals/judge/items.json, evals/judge/judge_scores.json and evals/results/judge_calibration.json.
+Writes evals/judge/items.json, evals/judge/judge_scores.json (judge_scores_v2.json for the v2 prompt) and
+evals/results/judge_calibration.json (one block per prompt version).
 Your labels are evals/judge/human_labels.json.
 """
 from __future__ import annotations
 
 import argparse
 import json
+import math
 import os
 import random
 import time
@@ -30,6 +33,7 @@ ROOT = Path(__file__).resolve().parents[2]
 JDIR = ROOT / "evals/judge"
 ITEMS, HUMAN, SCORES = JDIR / "items.json", JDIR / "human_labels.json", JDIR / "judge_scores.json"
 N_ITEMS = 30
+PROMPTS = {"judge": SCORES, "judge_v2": JDIR / "judge_scores_v2.json"}
 
 
 class Verdict(BaseModel):
@@ -67,7 +71,7 @@ def build() -> None:
           f"{ {s: sum(i['source'] == s for i in items) for s in {i['source'] for i in items}} })")
 
 
-def score(model: str, extra_sources: bool) -> None:
+def score(model: str, extra_sources: bool, prompt: str = "judge") -> None:
     os.environ.setdefault("GIGBID_RATE_WAIT", str(8 * 3600))
     from agent.llm import structured
     items = json.loads(ITEMS.read_text())["items"]
@@ -80,7 +84,8 @@ def score(model: str, extra_sources: bool) -> None:
                     j = gold[r["job_id"]]["job"]
                     items.append({"item": f"x_{arm}_{r['job_id']}", "source": f"prop_{arm}", "job_id": r["job_id"],
                                   "letter": r["draft"], "title": j["title"], "description": j["description"][:1500]})
-    out = json.loads(SCORES.read_text()) if SCORES.exists() else {"model": model, "scores": {}}
+    path = PROMPTS[prompt]
+    out = json.loads(path.read_text()) if path.exists() else {"model": model, "prompt": prompt, "scores": {}}
     os.environ["MODEL_PROFILE"] = "open"
     from agent import settings
     settings.profile()["nodes"]["judge"] = model
@@ -88,10 +93,10 @@ def score(model: str, extra_sources: bool) -> None:
         if it["item"] in out["scores"]:
             continue
         v, u = structured("judge", Verdict, {"title": it["title"], "description": it["description"],
-                                             "letter": it["letter"]})
+                                             "letter": it["letter"]}, prompt=prompt)
         out["scores"][it["item"]] = {**v.model_dump(), "source": it["source"], "job_id": it["job_id"],
                                      "tokens": u.get("tokens_in", 0) + u.get("tokens_out", 0)}
-        SCORES.write_text(json.dumps(out, indent=1) + "\n")
+        path.write_text(json.dumps(out, indent=1) + "\n")
         print(f"{it['item']:<28} {it['source']:<14} score={v.score} send={v.send}", flush=True)
 
 
@@ -117,25 +122,67 @@ def kappa(a: list, b: list, weights: str | None = None, cats: list | None = None
     return round(1 - num / den, 4) if den else None
 
 
-def calibrate() -> dict:
-    human = json.loads(HUMAN.read_text())["labels"]
-    judge = json.loads(SCORES.read_text())
-    ids = [i for i in human if i in judge["scores"]]
+def agreement(human: dict, judge: dict, ids: list[str]) -> dict:
     h_s = [human[i]["score"] for i in ids]
-    j_s = [judge["scores"][i]["score"] for i in ids]
+    j_s = [judge[i]["score"] for i in ids]
     h_b = [human[i]["send"] for i in ids]
-    j_b = [judge["scores"][i]["send"] for i in ids]
-    disagreements = sorted(({"item": i, "human": human[i], "judge": judge["scores"][i]} for i in ids),
-                           key=lambda d: -abs(d["human"]["score"] - d["judge"]["score"]))[:5]
-    out = {"generated_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()), "judge_model": judge["model"],
-           "n": len(ids), "kappa_score_quadratic": kappa(h_s, j_s, "quadratic", [1, 2, 3, 4, 5]),
-           "kappa_send": kappa(h_b, j_b, None, [False, True]),
-           "exact_agreement": round(sum(x == y for x, y in zip(h_s, j_s)) / max(1, len(ids)), 4),
-           "within_one": round(sum(abs(x - y) <= 1 for x, y in zip(h_s, j_s)) / max(1, len(ids)), 4),
-           "mean_human": round(sum(h_s) / max(1, len(h_s)), 3), "mean_judge": round(sum(j_s) / max(1, len(j_s)), 3),
-           "largest_disagreements": disagreements}
+    j_b = [judge[i]["send"] for i in ids]
+    n = max(1, len(ids))
+    return {"n": len(ids), "kappa_score_quadratic": kappa(h_s, j_s, "quadratic", [1, 2, 3, 4, 5]),
+            "kappa_send": kappa(h_b, j_b, None, [False, True]),
+            "exact_agreement": round(sum(x == y for x, y in zip(h_s, j_s)) / n, 4),
+            "within_one": round(sum(abs(x - y) <= 1 for x, y in zip(h_s, j_s)) / n, 4),
+            "mean_human": round(sum(h_s) / n, 3), "mean_judge": round(sum(j_s) / n, 3),
+            "send_human": sum(h_b), "send_judge": sum(j_b)}
+
+
+def human_by_arm(human: dict, items: dict) -> dict:
+    """Your own scores per source, and the B arms compared on the jobs where you labelled both drafts."""
+    by: dict[str, list[int]] = {}
+    pairs: dict[str, dict[str, int]] = {}
+    for i, lab in human.items():
+        src = items[i]["source"]
+        by.setdefault(src, []).append(lab["score"])
+        pairs.setdefault(items[i]["job_id"], {})[src] = lab["score"]
+    out = {src: {"n": len(v), "mean_score": round(sum(v) / len(v), 3),
+                 "send": sum(human[i]["send"] for i in human if items[i]["source"] == src)} for src, v in by.items()}
+    pp = [(p["prop_v0_naive"], p["prop_combined"]) for p in pairs.values() if {"prop_v0_naive", "prop_combined"} <= p.keys()]
+    better, worse = sum(c > v for v, c in pp), sum(v > c for v, c in pp)
+    n = better + worse                                       # two-sided sign test on the untied pairs
+    p_sign = min(1.0, 2 * sum(math.comb(n, k) for k in range(min(better, worse) + 1)) / 2 ** n) if n else 1.0
+    out["paired_v0_vs_combined"] = {"pairs": len(pp), "combined_better": better, "v0_better": worse,
+                                    "ties": len(pp) - n, "sign_test_p": round(p_sign, 4)}
+    return out
+
+
+def calibrate() -> dict:
+    """Agreement per prompt version, on all items and on the items whose job carries a planted instruction."""
+    human = json.loads(HUMAN.read_text())["labels"]
+    items = {i["item"]: i for i in json.loads(ITEMS.read_text())["items"]}
+    out = {"generated_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())}
+    for prompt, path in PROMPTS.items():
+        if not path.exists():
+            continue
+        judge = json.loads(path.read_text())
+        sc = judge["scores"]
+        ids = [i for i in human if i in sc]
+        inj = [i for i in ids if items[i]["source"].startswith("injection")]
+        block = {"judge_model": judge["model"], "prompt": f"agent/prompts/{prompt}.md", **agreement(human, sc, ids),
+                 "injection_items": agreement(human, sc, inj),
+                 "other_items": agreement(human, sc, [i for i in ids if i not in inj]),
+                 "largest_disagreements": sorted(({"item": i, "human": human[i], "judge": sc[i]} for i in ids),
+                                                 key=lambda d: -abs(d["human"]["score"] - d["judge"]["score"]))[:5]}
+        if prompt == "judge":
+            out.update(block)                                # v1 at top level (older readers)
+        else:
+            out[prompt] = block
+    out["human_by_arm"] = human_by_arm(human, items)
     (RESULTS / "judge_calibration.json").write_text(json.dumps(out, indent=1, default=str) + "\n")
-    print(json.dumps({k: v for k, v in out.items() if k != "largest_disagreements"}, indent=1))
+    for k, b in [("judge", out)] + [(p, out[p]) for p in PROMPTS if p in out]:
+        print(k, {x: b[x] for x in ("n", "kappa_score_quadratic", "kappa_send", "exact_agreement", "within_one",
+                                    "mean_human", "mean_judge", "send_human", "send_judge")})
+        print("   injection items", b["injection_items"]["kappa_score_quadratic"], "| other",
+              b["other_items"]["kappa_score_quadratic"])
     return out
 
 
@@ -146,13 +193,14 @@ def main() -> None:
     ap.add_argument("--kappa", action="store_true")
     ap.add_argument("--all-drafts", action="store_true", help="also score every B draft (for the results table)")
     ap.add_argument("--model", default="openai/gpt-oss-120b")
+    ap.add_argument("--prompt", default="judge", choices=sorted(PROMPTS))
     a = ap.parse_args()
     os.environ.setdefault("GIGBID_DB", "sqlite")
     os.environ.setdefault("GIGBID_LANGFUSE", "off")
     if a.build:
         build()
     if a.score:
-        score(a.model, a.all_drafts)
+        score(a.model, a.all_drafts, a.prompt)
     if a.kappa:
         calibrate()
 

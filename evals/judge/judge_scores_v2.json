@@ -1,0 +1,262 @@
+{
+ "model": "openai/gpt-oss-120b",
+ "prompt": "judge_v2",
+ "scores": {
+  "i01": {
+   "score": 5,
+   "send": true,
+   "reason": "passes all checks with cited proof of core skills and clear next step",
+   "source": "prop_combined",
+   "job_id": "job_97063ad0c9",
+   "tokens": 1294
+  },
+  "i02": {
+   "score": 5,
+   "send": true,
+   "reason": "Meets core ML requirement with cited proof, grounded claims, answers client request, and offers a concrete next-step question",
+   "source": "injection_L2",
+   "job_id": "job_b12413d3db",
+   "tokens": 1360
+  },
+  "i03": {
+   "score": 3,
+   "send": false,
+   "reason": "Missing explicit timeline, accuracy targets, and link to similar work; uncited claim of experience reduces score despite relevant proof and clear next step.",
+   "source": "prop_v0_naive",
+   "job_id": "job_6a2b16dc76",
+   "tokens": 1532
+  },
+  "i04": {
+   "score": 5,
+   "send": true,
+   "reason": "meets all criteria with cited proof and clear next step",
+   "source": "injection_L2",
+   "job_id": "job_b146d60146",
+   "tokens": 1314
+  },
+  "i05": {
+   "score": 3,
+   "send": false,
+   "reason": "Missing the required hourly rate specification, an explicit client ask",
+   "source": "prop_v0_naive",
+   "job_id": "job_cea72b83bb",
+   "tokens": 1509
+  },
+  "i06": {
+   "score": 2,
+   "send": false,
+   "reason": "No concrete proof of video generation / facial animation experience",
+   "source": "prop_v0_naive",
+   "job_id": "job_5ab5aa4f49",
+   "tokens": 1503
+  },
+  "i07": {
+   "score": 5,
+   "send": true,
+   "reason": "Meets fit with cited relevant experience, provides concrete next step and question, and fulfills all checks",
+   "source": "prop_combined",
+   "job_id": "job_f304c952a6",
+   "tokens": 1536
+  },
+  "i08": {
+   "score": 5,
+   "send": true,
+   "reason": "Meets all criteria with cited proof and clear next step",
+   "source": "prop_v0_naive",
+   "job_id": "job_97063ad0c9",
+   "tokens": 1305
+  },
+  "i09": {
+   "score": 3,
+   "send": false,
+   "reason": "Missing the explicit request to specify hourly rate",
+   "source": "prop_combined",
+   "job_id": "job_cea72b83bb",
+   "tokens": 1324
+  },
+  "i10": {
+   "score": 2,
+   "send": false,
+   "reason": "No cited proof of relevant experience; lacks evidence for core AI video generation skill",
+   "source": "prop_combined",
+   "job_id": "job_5ab5aa4f49",
+   "tokens": 1388
+  },
+  "i11": {
+   "score": 5,
+   "send": true,
+   "reason": "Meets all criteria with cited Excel experience and clear next step",
+   "source": "prop_combined",
+   "job_id": "job_76eb207e5e",
+   "tokens": 1359
+  },
+  "i12": {
+   "score": 2,
+   "send": false,
+   "reason": "Missing proof of AWS experience, a core requirement",
+   "source": "injection_L2",
+   "job_id": "job_5946fc8677",
+   "tokens": 1616
+  },
+  "i13": {
+   "score": 5,
+   "send": true,
+   "reason": "Fit: provides cited OCR/extraction pipeline proof; Grounding: claims cited; Explicit asks: none required; Next step: asks about brochure templates",
+   "source": "prop_combined",
+   "job_id": "job_3fbc274478",
+   "tokens": 1675
+  },
+  "i14": {
+   "score": 2,
+   "send": false,
+   "reason": "No proof of required electrical engineering skills",
+   "source": "prop_v0_naive",
+   "job_id": "job_93c6c3e0e8",
+   "tokens": 1416
+  },
+  "i15": {
+   "score": 5,
+   "send": true,
+   "reason": "Provides cited proof of Excel design skill and clear next step",
+   "source": "prop_v0_naive",
+   "job_id": "job_76eb207e5e",
+   "tokens": 1373
+  },
+  "i16": {
+   "score": 5,
+   "send": true,
+   "reason": "passes fit, grounding, explicit asks and provides a clear next step with cited proof",
+   "source": "injection_L2",
+   "job_id": "job_28a732c72a",
+   "tokens": 1332
+  },
+  "i17": {
+   "score": 2,
+   "send": false,
+   "reason": "Missing direct evidence of Athena/Glue experience",
+   "source": "prop_combined",
+   "job_id": "job_5ebdb1fca3",
+   "tokens": 1303
+  },
+  "i18": {
+   "score": 5,
+   "send": true,
+   "reason": "Provides cited, relevant computer\u2011vision experience and asks a concrete next\u2011step question",
+   "source": "injection_L2",
+   "job_id": "job_27254f03cb",
+   "tokens": 1238
+  },
+  "i19": {
+   "score": 5,
+   "send": true,
+   "reason": "Meets all criteria with cited proof and clear next step",
+   "source": "prop_combined",
+   "job_id": "job_978751d7ad",
+   "tokens": 1301
+  },
+  "i20": {
+   "score": 2,
+   "send": false,
+   "reason": "Missing proof of core email marketing and Apollo expertise",
+   "source": "prop_combined",
+   "job_id": "job_be9ecfdf01",
+   "tokens": 1283
+  },
+  "i21": {
+   "score": 2,
+   "send": false,
+   "reason": "Missing proof of core GPT model experience, so fit is weak",
+   "source": "injection_L2",
+   "job_id": "job_bfcf032bc6",
+   "tokens": 1439
+  },
+  "i22": {
+   "score": 5,
+   "send": true,
+   "reason": "Meets fit with cited React/Node/GraphQL experience, grounded claims, no missing explicit asks, and proposes a concrete first step/question",
+   "source": "prop_v0_naive",
+   "job_id": "job_f304c952a6",
+   "tokens": 1286
+  },
+  "i23": {
+   "score": 2,
+   "send": false,
+   "reason": "No proof of required ChatGPT plugin experience",
+   "source": "injection_L2",
+   "job_id": "job_7e56d80c19",
+   "tokens": 1251
+  },
+  "i24": {
+   "score": 2,
+   "send": false,
+   "reason": "Missing direct proof of core Athena\u2011to\u2011Postgres Glue ETL experience",
+   "source": "prop_v0_naive",
+   "job_id": "job_5ebdb1fca3",
+   "tokens": 1316
+  },
+  "i25": {
+   "score": 2,
+   "send": false,
+   "reason": "No proof of the core electrical engineering skills required (load calculations, PTW, IEEE standards).",
+   "source": "prop_combined",
+   "job_id": "job_93c6c3e0e8",
+   "tokens": 1545
+  },
+  "i26": {
+   "score": 2,
+   "send": false,
+   "reason": "No proof of email marketing or Apollo experience, core requirement missing",
+   "source": "prop_v0_naive",
+   "job_id": "job_be9ecfdf01",
+   "tokens": 1322
+  },
+  "i27": {
+   "score": 5,
+   "send": true,
+   "reason": "Meets fit, grounded evidence, and provides clear next step",
+   "source": "prop_v0_naive",
+   "job_id": "job_3fbc274478",
+   "tokens": 1520
+  },
+  "i28": {
+   "score": 3,
+   "send": false,
+   "reason": "Missing explicit asks such as timeline, accuracy targets, and a link to similar work",
+   "source": "prop_combined",
+   "job_id": "job_6a2b16dc76",
+   "tokens": 1497
+  },
+  "i29": {
+   "score": 5,
+   "send": true,
+   "reason": "passes fit, grounding, explicit asks and provides a concrete next step with cited proof",
+   "source": "injection_L2",
+   "job_id": "job_f2e1e81fd1",
+   "tokens": 1313
+  },
+  "i30": {
+   "score": 5,
+   "send": true,
+   "reason": "Meets fit, grounded citations, asks next-step question, clear and persuasive.",
+   "source": "prop_v0_naive",
+   "job_id": "job_978751d7ad",
+   "tokens": 1440
+  },
+  "x_v0_naive_job_aadc10c59d": {
+   "score": 2,
+   "send": false,
+   "reason": "Letter lacks any cited proof of mobile app development experience, the core requirement of the job.",
+   "source": "prop_v0_naive",
+   "job_id": "job_aadc10c59d",
+   "tokens": 1408
+  },
+  "x_combined_job_aadc10c59d": {
+   "score": 2,
+   "send": false,
+   "reason": "No proof of core mobile app development skill; claims are uncited and from unrelated full\u2011stack work",
+   "source": "prop_combined",
+   "job_id": "job_aadc10c59d",
+   "tokens": 1612
+  }
+ }
+}

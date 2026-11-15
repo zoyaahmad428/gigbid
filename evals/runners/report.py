@@ -88,8 +88,8 @@ def canary_hit(r: dict, text: str | None) -> bool:
 
 
 # ------------------------------------------------------------------ sections
-def decisions() -> dict:
-    rs = [r for r in rows("decisions") if not r.get("error")]
+def decisions(rs: list[dict] | None = None) -> dict:
+    rs = [r for r in (rows("decisions") if rs is None else rs) if not r.get("error")]
     if not rs:
         return {}
     from agent.settings import config
@@ -119,6 +119,28 @@ def decisions() -> dict:
             "usd_per_job": round(sum(c for _, c in tok) / len(tok), 6), "wrong_decisions": wrong}
 
 
+def decisions_v2() -> dict:
+    """The decisions run after the injection change (regex v2 + risk prompt v2).
+
+    Only the 11 jobs the change can affect were re-run (tag decisions_v2: every job either regex flagged,
+    every scam, and the wrong decisions involving an injection); the other 25 keep their first-run rows.
+    """
+    new = {r["job_id"]: r for r in rows("decisions_v2") if not r.get("error")}
+    if not new:
+        return {}
+    old = {r["job_id"]: r for r in rows("decisions") if not r.get("error")}
+    right = lambda r: (r["decision"] == "bid") == (r["gold_action"] == "bid")  # noqa: E731
+    changes = [{"job_id": k, "kind": r["kind"], "gold": r["gold_action"], "v1": old[k]["decision"],
+                "v2": r["decision"], "v1_risk": old[k].get("risk"), "v2_risk": r.get("risk"),
+                "v1_correct": right(old[k]), "v2_correct": right(r)} for k, r in new.items() if k in old]
+    merged = [new.get(r["job_id"], r) for r in old.values()]
+    return {"rerun_jobs": len(changes), "rerun_correct_v1": sum(c["v1_correct"] for c in changes),
+            "rerun_correct_v2": sum(c["v2_correct"] for c in changes),
+            "scams_in_rerun": sum(new[c["job_id"]]["is_scam"] for c in changes),
+            "scams_bid_on_v2": sum(new[c["job_id"]]["is_scam"] and c["v2"] == "bid" for c in changes),
+            "changes": changes, "all_jobs_with_v2": decisions(merged)}
+
+
 def proposal_quality() -> dict:
     out = {}
     retr = {"v0_naive": next((s for s in load("rag_retrieval_variants.json").get("summaries", [])
@@ -129,7 +151,9 @@ def proposal_quality() -> dict:
         retr["v0_naive"] = {m: round(sum(s[m] * s["n_bid_jobs"] for s in v0) / n, 4) for m in ("recall@5", "ndcg@10")}
     gate = load("ci_gate.json").get("retrieval", {})
     retr["combined"] = {"recall@5": gate.get("recall@5"), "ndcg@10": gate.get("ndcg@10")}
-    judge = load("../judge/judge_scores.json") if (RESULTS.parent / "judge/judge_scores.json").exists() else {}
+    # the calibrated judge: v2 (agent/prompts/judge_v2.md) when it has scored, else v1
+    jfile = next((f for f in ("judge_scores_v2.json", "judge_scores.json") if (RESULTS.parent / "judge" / f).exists()), None)
+    judge = load(f"../judge/{jfile}") if jfile else {}
     jscores = (judge or {}).get("scores", {})
     outcomes = load("outcomes.json")
     for arm in ("v0_naive", "combined"):
@@ -152,6 +176,7 @@ def proposal_quality() -> dict:
             "unsupported_rate_after_verification_yardstick": round(sum(y["unsupported"] for y in yard) /
                                                                    max(1, sum(y["claims"] for y in yard)), 4),
             "judge_score": round(sum(js) / len(js), 3) if js else None, "judge_n": len(js),
+            "judge_prompt": (judge or {}).get("prompt", "judge"),
             "gigsim_reply_rate": (outcomes.get(f"prop_{arm}") or {}).get("reply_rate"),
             "gigsim_submitted": (outcomes.get(f"prop_{arm}") or {}).get("submitted"),
             "p95_latency_s": percentile(secs, 0.95), "p50_latency_s": percentile(secs, 0.5),
@@ -247,6 +272,19 @@ def markdown(s: dict) -> str:
               f"Latency excludes rate-limit pauses: {d['latency_s']['n']} of {d['n_jobs']} runs; the others paused "
               "on the daily token limit before pauses were recorded.", "",
               table(["Job type", "n", "Accuracy"], [[k, v["n"], v["accuracy"]] for k, v in d["by_kind"].items()]), ""]
+    v2 = s.get("decisions_v2") or {}
+    if v2:
+        m = v2["all_jobs_with_v2"]
+        parts += ["## Decisions after the injection change (regex v2 + risk prompt v2)", "",
+                  f"{v2['rerun_jobs']} jobs re-run; correct {v2['rerun_correct_v1']} -> {v2['rerun_correct_v2']}; "
+                  f"scams bid on {v2['scams_bid_on_v2']} of {v2['scams_in_rerun']}. All {m['n_jobs']} jobs with the "
+                  "re-run rows substituted:", "", table(
+                      ["Jobs", "Bid-or-skip F1", "Precision", "Recall", "Accuracy", "Scam P", "Scam R"],
+                      [[m["n_jobs"], m["bid_or_skip"]["f1"], m["bid_or_skip"]["precision"], m["bid_or_skip"]["recall"],
+                        m["bid_or_skip"]["accuracy"], m["scam"]["precision"], m["scam"]["recall"]]]), "",
+                  table(["Job", "Kind", "Gold", "v1", "v2", "Risk v1 -> v2"],
+                        [[c["job_id"], c["kind"], c["gold"], c["v1"], c["v2"], f"{c['v1_risk']} -> {c['v2_risk']}"]
+                         for c in v2["changes"]]), ""]
     b = s.get("proposal_quality") or {}
     if b:
         parts += ["## R&D question B: V0 vs the shipped retriever", "", table(
@@ -280,12 +318,17 @@ def markdown(s: dict) -> str:
              "Tokens / task"],
             [[k, v["n_tasks"], v["tool_selection_accuracy"], v["argument_accuracy"], v["fully_correct_calls"],
               v["tokens_per_task"]] for k, v in a.items()]), ""]
-    j = s.get("judge_calibration") or {}
-    if j:
-        parts += ["## Judge calibration", "", f"{j['n']} items labelled by hand; judge {j['judge_model']}: "
-                  f"quadratic-weighted Cohen's kappa {j['kappa_score_quadratic']} on the 1-5 score, kappa "
-                  f"{j['kappa_send']} on 'send as is'; exact agreement {j['exact_agreement']}, within one point "
-                  f"{j['within_one']}.", ""]
+    jc = s.get("judge_calibration") or {}
+    if jc:
+        blocks = [("v1 (judge.md)", jc)] + ([("v2 (judge_v2.md)", jc["judge_v2"])] if "judge_v2" in jc else [])
+        parts += ["## Judge calibration", "", f"{jc['n']} items labelled by hand; judge {jc['judge_model']}. "
+                  "v2 was written after seeing v1's disagreements on these items, so its agreement is optimistic.", "",
+                  table(["Prompt", "Kappa, score (quadratic)", "Kappa, send", "Exact", "Within one", "Mean judge",
+                         "Mean human", "Send: judge / human", "Kappa, injection items", "Kappa, other items"],
+                        [[k, b["kappa_score_quadratic"], b["kappa_send"], b["exact_agreement"], b["within_one"],
+                          b["mean_judge"], b["mean_human"], f"{b['send_judge']} / {b['send_human']}",
+                          b["injection_items"]["kappa_score_quadratic"], b["other_items"]["kappa_score_quadratic"]]
+                         for k, b in blocks]), ""]
     x = s.get("x2") or {}
     if x:
         parts += ["## Extension X2: pricing A/B in GigSim", "", table(
@@ -309,7 +352,7 @@ def markdown(s: dict) -> str:
 def main() -> None:
     os.environ.setdefault("GIGBID_DB", "sqlite")
     s = {"generated_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()), "decisions": decisions(),
-         "proposal_quality": proposal_quality(), "orchestration": orchestration(),
+         "decisions_v2": decisions_v2(), "proposal_quality": proposal_quality(), "orchestration": orchestration(),
          "injection": load("injection_asr.json"), "tool_granularity": load("tool_granularity.json"),
          "judge_calibration": load("judge_calibration.json"), "x2": load("x2_pricing.json"),
          "outcomes": load("outcomes.json")}
