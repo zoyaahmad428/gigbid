@@ -55,6 +55,28 @@ if os.environ.get("SPACES_ZERO_GPU", "").lower() in {"1", "true"}:
     spaces.zero.startup()
     print("ZeroGPU startup report sent (GigBid runs on the CPU)", flush=True)
 
+
+
+def _probe_llm_provider() -> None:
+    """Log whether the LLM provider is reachable from this Space (never logs the key)."""
+    try:
+        from agent import llm
+
+        proxies = sorted(k for k in os.environ if k.lower() in {"http_proxy", "https_proxy", "all_proxy", "no_proxy"})
+        p = llm.provider()
+        print(f"LLM probe: {p['base_url']} (proxy env: {proxies or 'none'})", flush=True)
+        models = llm.client().with_options(max_retries=0, timeout=15).models.list()
+        print(f"LLM probe: OK, {len(models.data)} models visible", flush=True)
+    except Exception as e:  # noqa: BLE001  (diagnostics only; the app starts either way)
+        chain, cur = [], e
+        while cur is not None:
+            chain.append(f"{type(cur).__name__}: {str(cur)[:200]}")
+            cur = cur.__cause__ or cur.__context__
+        print("LLM probe FAILED: " + " <- ".join(chain), flush=True)
+
+
+_probe_llm_provider()
+
 from rag.models import _embedder, _reranker, embedding_name, reranker_name  # noqa: E402
 
 list(_embedder(embedding_name()).embed(["warm"]))

@@ -31,6 +31,14 @@ class LLMError(RuntimeError):
     pass
 
 
+def _root_cause(e: BaseException) -> str:
+    """The innermost cause of a connection error (DNS, TLS, proxy, refused...), which the OpenAI
+    client hides behind a bare "Connection error."."""
+    while e.__cause__ is not None or e.__context__ is not None:
+        e = e.__cause__ or e.__context__
+    return f" <- {type(e).__name__}: {str(e)[:200]}"
+
+
 @lru_cache(maxsize=4)
 def _client(base_url: str, key_env: str) -> OpenAI:
     # strip: a key pasted into a hosting secret often ends in a newline, which httpx rejects as a
@@ -168,7 +176,7 @@ def structured(node: str, out_model: type[T], variables: dict, *, prompt: str | 
                 msg = render("json_retry", {"user": user})[1]
                 continue
             except (APIConnectionError, APITimeoutError, RateLimitError) as e:
-                last_err = f"{type(e).__name__}: {e}"
+                last_err = f"{type(e).__name__}: {e}{_root_cause(e)}"
                 break                                   # try the fallback model
             for k in ("tokens_in", "tokens_out", "cost_usd"):
                 total[k] += u[k]
