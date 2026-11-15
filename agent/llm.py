@@ -33,7 +33,9 @@ class LLMError(RuntimeError):
 
 @lru_cache(maxsize=4)
 def _client(base_url: str, key_env: str) -> OpenAI:
-    key = os.environ.get(key_env)
+    # strip: a key pasted into a hosting secret often ends in a newline, which httpx rejects as a
+    # header value, and the OpenAI client reports that as a bare "APIConnectionError: Connection error."
+    key = (os.environ.get(key_env) or "").strip()
     if not key:
         raise LLMError(f"{key_env} is not set (put the provider key in .env)")
     return OpenAI(api_key=key, base_url=base_url, timeout=config()["models"]["request_timeout_seconds"],
