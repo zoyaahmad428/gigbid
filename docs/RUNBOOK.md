@@ -60,6 +60,12 @@ The Space then runs `app.py` (`infra/deploy/space_app.py`): it warms the retriev
 starts GigSim and the API without Redis or the worker (`GIGBID_RUNNER=inprocess`; runs execute in
 the API process). The web app is built locally and pushed with the code.
 
+If CPU basic isn't free either and the Space runs on **ZeroGPU**, `app.py` registers a placeholder
+`@spaces.GPU` function and sends ZeroGPU's startup report itself (otherwise the Space stops with
+"No @spaces.GPU function detected during startup"). GigBid never uses the GPU.
+Because the SDK's `gradio[mcp]` extra pins `mcp<2` and `pydantic<=2.12.5`, those two packages are
+installed by `app.py` at start-up (`requirements-runtime.txt`), not at build time.
+
 **Limits of the free Space:**
 - **Persistence.** The disk is not persistent. A restart (after 48 h without visitors, or a
   redeploy) clears runs and users, and seeded accounts are recreated at start-up. With

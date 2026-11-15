@@ -41,8 +41,19 @@ if [[ -n "$GRADIO" ]]; then
   (cd "$ROOT/apps/web" && npm ci --no-audit --no-fund --silent && npm run build --silent)
   mkdir -p "$OUT/apps/web" && cp -r "$ROOT/apps/web/dist" "$OUT/apps/web/dist"
   cp "$ROOT/infra/deploy/space_app.py" "$OUT/app.py"
-  python3 -c "import tomllib; d = tomllib.load(open('$ROOT/pyproject.toml', 'rb')); \
-print('\n'.join(d['project']['dependencies']))" > "$OUT/requirements.txt"
+  # The SDK installs gradio[oauth,mcp] in the same pip call as requirements.txt, and gradio 6.x's
+  # mcp extra pins mcp<2 and pydantic<=2.12.5, while GigBid needs mcp 2.x and pydantic 2.14. Those
+  # packages go to requirements-runtime.txt instead, which app.py installs at start-up (nothing on
+  # the Space imports gradio, so breaking its mcp extra doesn't matter).
+  RUNTIME_ONLY="mcp pydantic"
+  python3 - "$ROOT/pyproject.toml" "$OUT" $RUNTIME_ONLY <<'PY'
+import re, sys, tomllib
+pyproject, out, *runtime_only = sys.argv[1:]
+deps = tomllib.load(open(pyproject, "rb"))["project"]["dependencies"]
+name = lambda r: re.match(r"[A-Za-z0-9_.-]+", r).group(0).lower()
+open(f"{out}/requirements.txt", "w").write("".join(f"{r}\n" for r in deps if name(r) not in runtime_only))
+open(f"{out}/requirements-runtime.txt", "w").write("".join(f"{r}\n" for r in deps if name(r) in runtime_only))
+PY
   SDK_YAML='sdk: gradio
 sdk_version: 6.32.0
 python_version: "3.12"
@@ -90,6 +101,8 @@ fi
 cd "$OUT"
 git init -q -b main
 git add -A
+# apps/web/.gitignore ignores dist, but the Gradio Space needs the prebuilt web app
+[[ -n "$GRADIO" ]] && git add -f apps/web/dist
 git -c user.name="${GIT_AUTHOR_NAME:-$(git -C "$ROOT" config user.name)}" \
     -c user.email="${GIT_AUTHOR_EMAIL:-$(git -C "$ROOT" config user.email)}" \
     commit -q -m "Deploy GigBid $SHA"
