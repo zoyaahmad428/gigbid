@@ -3,12 +3,10 @@
 **An AI assistant that reads a freelancer's job feed, skips the scams and the poor fits, and drafts
 proposals from evidence in their own portfolio. Then it stops and waits for them to approve.**
 
-[[PENDING: demo GIF (docs/images/demo.gif), 30 seconds: inbox → analysis → draft with evidence → approve]]
-
 | | |
 |---|---|
-| **Live app** | <https://zoyaahmad-gigbid.hf.space> (Space: [huggingface.co/spaces/zoyaahmad/gigbid](https://huggingface.co/spaces/zoyaahmad/gigbid); free ZeroGPU hardware, so the first visit after a quiet spell takes about a minute to wake it). Reviewer login: [[PENDING: email / password]] (AI/ML persona) |
-| **Demo video (3 min)** | [[PENDING: link]] |
+| **Live app** | <https://zoyaahmad-gigbid.hf.space> (Space: [huggingface.co/spaces/zoyaahmad/gigbid](https://huggingface.co/spaces/zoyaahmad/gigbid); free ZeroGPU hardware, so the first visit after a quiet spell takes about a minute to wake it). The app is React + FastAPI; the Space uses the Gradio SDK only as a container to run it, and no Gradio code is involved. Reviewer login: given privately with the submission |
+| **Demo video (3 min)** | [Google Drive](https://drive.google.com/file/d/1r2tnehKhkegxdX16RifnMkeUGpRxSq8Q/view?usp=sharing): one job from inbox to approved proposal, a scam caught, an injected instruction ignored, a client reply handled |
 | **Write-up** | [[PENDING: link]] |
 | **Report** | [`docs/REPORT.pdf`](docs/REPORT.pdf) (R&D design review, 10 pages) |
 | **Portfolio MCP server** | `docker run -i --rm -e PORTFOLIO_PERSONA=ai_ml ghcr.io/zoyaahmad428/gigbid:latest python -m mcp_servers.portfolio.server` ([README](mcp_servers/portfolio/README.md)) |
@@ -95,7 +93,16 @@ rose to 0.61. That prompt was written after seeing the disagreements, so 0.61 is
 
 **Single agent vs prebuilt supervisor vs our graph** (same model, same tools):
 
-[[PENDING: C table]]
+The free tier's daily budget for gpt-oss-20b stopped this study after **one paired job** (a clean
+AI/ML bid; `summary.json`, `orchestration`), so this is a smoke test, not a verdict (report, section 5):
+
+| System | Bid-or-skip correct | Proposals | Unsupported claims / proposal | Tokens / job | p95 latency |
+|---|---|---|---|---|---|
+| ReAct agent, all tools | 0 / 1 (skipped a bid) | 0 | n/a | 19,215 | 9.3 s |
+| Prebuilt supervisor | 0 / 1 (skipped a bid) | 0 | n/a | 16,852 | 16.7 s |
+| **GigBid graph** | **1 / 1** | 1 | 0.0 | **10,741** | 29.1 s |
+
+The single agent is about 3× faster; the graph uses 44% fewer tokens and was the only one to bid.
 
 **Safety:**
 
@@ -109,7 +116,7 @@ rose to 0.61. That prompt was written after seeing the disagreements, so 0.61 is
 
 - [Scam post skipped before any writing](docs/traces/skipped-scam.md)
 - [Approved proposal with a bounded Critic loop](docs/traces/approved-proposal.md)
-- [[PENDING: crash and resume]]
+- Crash and resume: tested rather than traced. [`tests/integration/test_worker.py`](tests/integration/test_worker.py) crashes a run mid-graph and checks it continues from its checkpoint, and that a job delivered twice does nothing the second time (`test_a_crashed_run_carries_on_from_its_checkpoint_instead_of_starting_over`, `test_a_job_delivered_twice_does_nothing_the_second_time`)
 
 ## Run it
 
@@ -171,3 +178,12 @@ Prices are the provider's list prices, as set in `agent/config.yaml`:
 
 [`docs/AI_USAGE.md`](docs/AI_USAGE.md) records how an AI coding assistant was used and the
 mistakes it made that were caught.
+
+## Résumé bullet
+
+- Built GigBid, a multi-agent LangGraph freelancer copilot with 3 MCP servers and human approval
+  before every send; hybrid, decomposed retrieval raised evidence Recall@5 from 0.37 to 0.59 and
+  cut unsupported claims per proposal to 0.00 after verification.
+- Defended it against prompt injection planted in job posts (attack success 7/15 → 0/15) while
+  keeping bid-or-skip F1 at 0.94 on 36 labelled jobs, at about $0.0006 per job analysed on
+  open-weight models.

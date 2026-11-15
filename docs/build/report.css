@@ -1,7 +1,7 @@
 /* Print style for docs/REPORT.md -> docs/REPORT.pdf (docs/build/build_report.sh) */
 :root { --ink: #1d1d1f; --muted: #5f6368; --rule: #d9d9de; --accent: #3b3b98; }
 html { font-size: 9.5pt; }
-body { font-family: "Source Serif 4", "Georgia", serif; color: var(--ink); line-height: 1.36; max-width: none; margin: 0; }
+body { font-family: "Source Serif 4", "Georgia", serif; color: var(--ink); line-height: 1.32; max-width: none; margin: 0; }
 header#title-block-header { margin-bottom: 1.2em; border-bottom: 2px solid var(--ink); padding-bottom: .6em; }
 h1.title { font-size: 20pt; margin: 0; }
 p.subtitle { font-size: 11pt; margin: .2em 0 0; color: var(--muted); }
@@ -16,6 +16,6 @@ table { border-collapse: collapse; width: 100%; margin: .5em 0 .9em; font-size: 
 th, td { border-bottom: 1px solid var(--rule); padding: .25em .4em; text-align: left; vertical-align: top; }
 th { border-bottom: 1.5px solid var(--ink); font-family: "Inter", Arial, sans-serif; }
 figure { margin: .6em auto; text-align: center; break-inside: avoid; }
-figure img { max-height: 92mm; }
+figure img { max-height: 78mm; }
 figcaption { font-size: 8.5pt; color: var(--muted); }
 strong { font-weight: 650; }
