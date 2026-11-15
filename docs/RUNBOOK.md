@@ -54,6 +54,12 @@ The free CPU Space (2 vCPU, 16 GB RAM) runs the single-container image. The step
 4. **Check the deployment.** Wait for the build (about 10 minutes). Then sign in with a seeded
    account, open the Inbox and analyse a job. Give reviewers the URL and their account.
 
+**If the Docker SDK isn't free on your account,** create the Space with the **Gradio** SDK
+instead (same secrets) and push with `infra/deploy/hf_space.sh <hf-user>/<space-name> --gradio`.
+The Space then runs `app.py` (`infra/deploy/space_app.py`): it warms the retriever models, then
+starts GigSim and the API without Redis or the worker (`GIGBID_RUNNER=inprocess`; runs execute in
+the API process). The web app is built locally and pushed with the code.
+
 **Limits of the free Space:**
 - **Persistence.** The disk is not persistent. A restart (after 48 h without visitors, or a
   redeploy) clears runs and users, and seeded accounts are recreated at start-up. With
@@ -72,6 +78,30 @@ The free CPU Space (2 vCPU, 16 GB RAM) runs the single-container image. The step
 | `worker.monitor_every_minutes` | config.yaml | 5 | Reading marketplace events (client messages, outcomes) |
 | `worker.job_timeout_seconds` | config.yaml | 600 | A run's time limit; also when a hard-killed worker's job runs again |
 | `GIGBID_WORKER_JOBS` | env | 2 | Runs a worker executes at once (Groq free tier: keep it low) |
+
+## Budgets (E5)
+
+Declared in `agent/config.yaml` (`budgets.declared`), open profile, excluding provider rate-limit
+pauses. `python -m evals.runners.report` measures them; see the "Budgets" table in
+`evals/results/RESULTS.md`.
+
+| Unit | p95 latency | Cost |
+|---|---|---|
+| Job analysed: load, three parallel analyses, decision, price | 45 s | $0.003 |
+| Proposal: job analysed + writer, verifier, critic, compliance, up to the approval card | 120 s | $0.01 |
+
+**What keeps them low:**
+
+- **Skipping early.** The decision comes before any writing, so a skipped job costs about a third
+  of a bid (around 3.3k vs 10.7k tokens).
+- **A small model for routing and risk.** gpt-oss-20b handles analysis, risk, intent and
+  compliance; only writing and critique use the 120b.
+- **Rule-based pricing,** with no model at all.
+- **Hard per-thread limits** (40k tokens, 30 steps) that move a runaway thread to
+  `needs_attention`.
+
+**If p95 rises,** check the trace's per-node table first. A long Critic loop shows as repeated
+`writer` and `critic` calls; provider pauses show as long gaps between calls.
 
 ## Rate limits
 

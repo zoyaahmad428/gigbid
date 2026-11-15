@@ -19,7 +19,9 @@ export GIGBID_RUNNER="${GIGBID_RUNNER:-worker}"
 export GIGSIM_STATE_DB="${GIGSIM_STATE_DB:-$STATE_DIR/gigsim.sqlite3}"
 
 mkdir -p "$STATE_DIR/redis"
-if [[ "$REDIS_URL" == redis://127.0.0.1* ]]; then
+# GIGBID_RUNNER=inprocess (the Gradio-SDK Space, which has no redis-server): runs execute inside the
+# API process, so neither Redis nor the worker is started.
+if [[ "$GIGBID_RUNNER" != inprocess && "$REDIS_URL" == redis://127.0.0.1* ]]; then
   REDIS_PORT="${REDIS_URL##*:}"; REDIS_PORT="${REDIS_PORT%%/*}"
   redis-server --bind 127.0.0.1 --port "$REDIS_PORT" --dir "$STATE_DIR/redis" --appendonly yes --save "" &
 fi
@@ -38,7 +40,9 @@ else:
 EOF
 python infra/docker/gigsim_warm.py                # a fresh simulator gets ~3 days of open jobs
 
-arq worker.main.WorkerSettings &
+if [[ "$GIGBID_RUNNER" != inprocess ]]; then
+  arq worker.main.WorkerSettings &
+fi
 uvicorn apps.api.main:app --host 0.0.0.0 --port "$PORT" --proxy-headers &
 
 wait -n
