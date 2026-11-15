@@ -40,6 +40,9 @@ git -C "$ROOT" archive HEAD | tar -x -C "$OUT"
 if [[ -n "$GRADIO" ]]; then
   (cd "$ROOT/apps/web" && npm ci --no-audit --no-fund --silent && npm run build --silent)
   mkdir -p "$OUT/apps/web" && cp -r "$ROOT/apps/web/dist" "$OUT/apps/web/dist"
+  # The Space is still built as a Docker image, and .dockerignore drops apps/web/dist (the Docker
+  # SDK image builds the web app itself). Keep the prebuilt copy in this image.
+  sed -i '\|^apps/web/dist$|d' "$OUT/.dockerignore"
   cp "$ROOT/infra/deploy/space_app.py" "$OUT/app.py"
   # The SDK installs gradio[oauth,mcp] in the same pip call as requirements.txt, and gradio 6.x's
   # mcp extra pins mcp<2 and pydantic<=2.12.5, while GigBid needs mcp 2.x and pydantic 2.14. Those
